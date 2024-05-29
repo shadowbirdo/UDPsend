@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block content %}
+<form action="{{url_for('editData')}}" method="POST">
+    <input type="hidden" name="nFestivosDataHidden" value="{{nFestivosData}}"/>
+    <input type="hidden" name="nFestivosDataHidden" value="{{nFestivosData}}"/>
+    <article class="tile is-child box p-6">
+        <label><b>Editar Datos</b></label>
+    </article>
+    <div class="columns p-6">
+        <div class="column is-half is-parent is-vertical p-6">
+            <article class="tile is-child box p-6">
+                <h3>Año</h3>
+                <input type="number" name="year" value="{{year}}" min=1970 max=2050/>
+            </article>
+            <article class="tile is-child box p-6">
+                <h3>Horarios</h3>
+                <div class="table-container">
+                    <table class="table is-fullwidth is-striped">
+                        <thead>
+                        <th>Indice</th>
+                        <th>Hora</th>
+                        <th>Duracion</th>
+                        <th>Volumen</th>
+                        <th>Cancion</th>
+                        </thead>
+                        {% for i in range(0, nHorariosData) %}
+                        <tr>
+                            <td>{{i}}</td>
+                            <td>{{horariosData[i][0]}}</td>
+                            <td>{{horariosData[i][1]}}</td>
+                            <td>{{horariosData[i][2]}}</td>
+                            <td>{{horariosData[i][3]}}</td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+                <p>Total {{nHorariosData}}</p>
+                <button class="button is-block is-info is-fullwidth" name="AddHorarioRow">Añadir Fila</button>
+            </article>
+        </div>
+        <div class="column is-half is-parent is-vertical p-6">
+            <article class="tile is-child box p-6">
+                <h3>Festivos</h3>
+                <div class="table-container">
+                    <table class="table is-fullwidth is-striped">
+                        <thead>
+                        <th>Indice</th>
+                        <th>Inicio</th>
+                        <th>Fin</th>
+                        </thead>
+                        {% for i in range(0, nFestivosData) %}
+                        <tr>
+                            <td>{{i}}</td>
+                            <td><input type="date" name="festivosIni{{i}}" value="{{festivosData[i][0]}}" min="1970-1-1" max="2050-31-12"></td>
+                            <td><input type="date" name="festivosFin{{i}}" value="{{festivosData[i][1]}}" min="1970-1-1" max="2050-31-12"></td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+                <p>Total {{nHorariosData}}</p>
+                <button class="button is-block is-info is-fullwidth" name="AddFestivoRow">Añadir Fila</button>
+            </article>
+            <article class="tile is-child box p-6">
+                <h3>Carpeta</h3>
+                <input type="number" name="carpeta" value="{{carpeta}}" min=1 max=99/>
+            </article>
+        </div>
+    </div>
+    <div class="box">
+        <h2 class="subtitle has-text-black">Acciones</h2>
+            <input type="hidden" name="nHorariosDataHidden" value="{{nHorariosData}}"/>
+            <button class="button is-block is-info is-fullwidth" name="GoHome">Volver</button>
+            <button class="button is-block is-warning is-fullwidth" name="Apply">Aplicar cambios</button>
+            <button class="button is-block is-danger is-fullwidth" name="Reload">Recargar</button>
+    </div>
+</form>
+{% endblock %}
