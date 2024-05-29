@@ -1,3 +1,4 @@
+import func
 from flask import Flask, render_template, request, redirect, url_for
 
 app = Flask(__name__)
@@ -53,12 +54,15 @@ def editData():
             return redirect(url_for('home'))
         elif request.form.get("Apply") is not None:
             carpeta = request.form.get("carpeta")
+            year = int(request.form.get("year"))
             for i in range(0, len(festivosData)):
                 festivosData[i][0] = request.form.get("festivosIni"+str(i))
                 festivosData[i][1] = request.form.get("festivosFin"+str(i))
             print("NEW festivosData", festivosData)
 
             # Send Commands
+            [func.udp_send(cal) for cal in func.gen_cal(year, 1)]
+            [print(cal) for cal in func.gen_cal(year, 1)]
             # Save to file
             File.horariosDataFile = horariosData
             File.festivosDataFile = festivosData
