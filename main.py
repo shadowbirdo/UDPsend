@@ -1,4 +1,4 @@
-import func
+import logic
 from flask import Flask, render_template, request, redirect, url_for
 
 app = Flask(__name__)
@@ -61,8 +61,13 @@ def editData():
             print("NEW festivosData", festivosData)
 
             # Send Commands
-            [func.udp_send(cal) for cal in func.gen_cal(year, 1)]
-            [print(cal) for cal in func.gen_cal(year, 1)]
+            [logic.udp_send(cal) for cal in logic.gen_cal(year, 1)]
+            [print(f"UDP enviado: {cal}") for cal in logic.gen_cal(year, 1)]
+            logic.udp_send(logic.gen_fol(carpeta))
+            print(f"UDP enviado: {logic.gen_fol(carpeta)}")
+            logic.udp_send(logic.gen_now())
+            print(f"UDP enviado: {logic.gen_now()}")
+
             # Save to file
             File.horariosDataFile = horariosData
             File.festivosDataFile = festivosData

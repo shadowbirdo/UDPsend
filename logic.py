@@ -13,6 +13,7 @@ def main():
     """
     Función principal.
     """
+    print(gen_now())
     year = int(input("Año: "))
     start_month = int(input("Mes: "))
     [print(cal) for cal in gen_cal(year, start_month)]
@@ -20,6 +21,15 @@ def main():
 
 
 def udp_send(msg):
+    """
+    Manda mensaje UDP.
+
+    Args:
+        msg (str): The message to be sent.
+
+    Returns:
+        None
+    """
     sock.sendto(msg.encode(), (UDP_IP, UDP_PORT))
 
 
@@ -56,6 +66,31 @@ def gen_cal(year, start_month):
         _udpCalY.append(_udpCalM.ljust(33, '-'))  # Asegurarse de que el string tenga 33 caracteres
 
     return _udpCalY
+
+
+def gen_fol(folder):
+    """
+    Genera una cadena con la carpeta de reproducción en el formato adecuado.
+
+    Args:
+        folder (str): Número de la carpeta como cadena.
+
+    Returns:
+        str: Nombre de la carpeta formateado con una "F" al inicio y con un cero a la izquierda si es necesario.
+    """
+    if len(f"{folder}") == 1:
+        folder = "0" + folder
+    return f"F{folder}"
+
+
+def gen_now():
+    """
+    Genera una cadena con la fecha y hora actual en el formato adecuado.
+
+    Returns:
+        str: Cadena con el formato 'D-YYYY/MM/DD/HH/MM/SS' representando la fecha y hora actual.
+    """
+    return f"D-{datetime.now().strftime('%Y/%m/%d/%H/%M/%S')}"
 
 
 if __name__ == '__main__':

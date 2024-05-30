@@ -1,5 +1,8 @@
+from logic import gen_cal
+
+
 def test2024():
-    assert main.gen_cal(2024, 1) == [
+    assert gen_cal(2024, 1) == [
         'C1FMXJVSDLMXJVSDLMXJVSDLMXJVSDLMX',
         'C2JVSDLMXJVSDLMXJVSDLMXJVSDLMXJ--',
         'C3VSDLMXJVSDLMXJVSDLMXJVSDLMXJVSD',
@@ -16,7 +19,7 @@ def test2024():
 
 
 def test2425():
-    assert main.gen_cal(2024, 7) == [
+    assert gen_cal(2024, 7) == [
         'C7LMXJVSDLMXJVSDLMXJVSDLMXJVSDLMX',
         'C8JVSDLMXJVSDLMXJVSDLMXJVSDLMXJVS',
         'C9DLMXJVSDLMXJVSDLMXJVSDLMXJVSDL-',
