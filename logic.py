@@ -14,8 +14,8 @@ def main():
     Función principal.
     """
     print(gen_now())
-    year = int(input("Año: "))
-    start_month = int(input("Mes: "))
+    year = int(input('Año: '))
+    start_month = int(input('Mes: '))
     [print(cal) for cal in gen_cal(year, start_month)]
     [udp_send(cal) for cal in gen_cal(year, start_month)]
 
@@ -68,6 +68,45 @@ def gen_cal(year, start_month):
     return _udpCalY
 
 
+def gen_time(timetable):
+    """
+    Genera una tupla que contiene el horario y el número de tramos horarios en el formato adecuado.
+
+    Args:
+        timetable (list of dict): Lista de diccionarios con todos los datos del horario.
+
+    Returns:
+        Tuple[str, str]: Tupla de 2 cadenas de caracteres: el horario[0] y el nº de tramos[1].
+    """
+    ...
+
+
+def gen_rep(timetable):
+    """
+    Genera una cadena con el tiempo de reproducción de cada tramo horario en el formato adecuado.
+
+    Args:
+        timetable (list of dict): Lista de diccionarios con todos los datos del horario.
+
+    Returns:
+        str: Cadenas de caracteres con el tiempo de reproducción de cada tramo horario.
+    """
+    ...
+
+
+def gen_vol(timetable):
+    """
+    Genera una cadena con el tiempo de reproducción de cada tramo horario en el formato adecuado.
+
+    Args:
+        timetable (list of dict): Lista de diccionarios con todos los datos del horario.
+
+    Returns:
+        str: Cadenas de caracteres con el tiempo de reproducción de cada tramo horario.
+    """
+    ...
+
+
 def gen_fol(folder):
     """
     Genera una cadena con la carpeta de reproducción en el formato adecuado.
@@ -78,9 +117,9 @@ def gen_fol(folder):
     Returns:
         str: Nombre de la carpeta formateado con una "F" al inicio y con un cero a la izquierda si es necesario.
     """
-    if len(f"{folder}") == 1:
-        folder = "0" + folder
-    return f"F{folder}"
+    if len(f'{folder}') == 1:
+        folder = '0' + folder
+    return f'F{folder}'
 
 
 def gen_now():
@@ -90,7 +129,7 @@ def gen_now():
     Returns:
         str: Cadena con el formato 'D-YYYY/MM/DD/HH/MM/SS' representando la fecha y hora actual.
     """
-    return f"D-{datetime.now().strftime('%Y/%m/%d/%H/%M/%S')}"
+    return f'D-{datetime.now().strftime('%Y/%m/%d/%H/%M/%S')}'
 
 
 if __name__ == '__main__':

@@ -1,42 +1,38 @@
-{% extends "base.html" %}
+{% extends "base.html" %}  <!-- Extiende la plantilla base -->
 
 {% block content %}
-<form action="{{url_for('editData')}}" method="POST">
-    <input type="hidden" name="nFestivosDataHidden" value="{{nFestivosData}}"/>
-    <input type="hidden" name="nHorariosDataHidden" value="{{nHorariosData}}"/>
+<form action="{{url_for('editData')}}" method="POST">  <!-- Formulario que envía los datos al endpoint 'editData' usando el método POST -->
+    <input type="hidden" name="nFestivosDataHidden" value="{{nFestivosData}}"/>  <!-- Campo oculto para el número de festivos -->
+    <input type="hidden" name="nHorariosDataHidden" value="{{nHorariosData}}"/>  <!-- Campo oculto para el número de horarios -->
     <article class="tile is-child box p-6">
-        <label><b>Editar Datos</b></label>
+        <label><b>Editar Datos</b></label>  <!-- Etiqueta de encabezado para la sección de edición de datos -->
     </article>
     <div class="columns p-6">
         <div class="column is-half is-parent is-vertical p-6">
             <article class="tile is-child box p-6">
                 <h3>Año</h3>
-                <input type="number" name="year" value="{{year}}" min=1970 max=2050/>
+                <input type="number" name="year" value="{{year}}" min=1970 max=2050/>  <!-- Campo de entrada para el año con restricciones de mínimo y máximo -->
             </article>
             <article class="tile is-child box p-6">
                 <h3>Horarios</h3>
                 <div class="table-container">
                     <table class="table is-fullwidth is-striped">
                         <thead>
-                        <th>Indice</th>
-                        <th>Hora</th>
-                        <th>Duracion</th>
-                        <th>Volumen</th>
-                        <th>Cancion</th>
+                        <th>Hora</th>  <!-- Encabezado de la columna Hora -->
+                        <th>Duración</th>  <!-- Encabezado de la columna Duración -->
+                        <th>Volumen</th>  <!-- Encabezado de la columna Volumen -->
                         </thead>
-                        {% for i in range(0, nHorariosData) %}
+                        {% for i in range(0, nHorariosData) %}  <!-- Bucle para iterar sobre los datos de horarios -->
                         <tr>
-                            <td>{{i}}</td>
-                            <td>{{horariosData[i][0]}}</td>
-                            <td>{{horariosData[i][1]}}</td>
-                            <td>{{horariosData[i][2]}}</td>
-                            <td>{{horariosData[i][3]}}</td>
+                            <td><input type="time" name="time{{i}}" value="{{horariosData[i]['time']}}"/></td>  <!-- Campo de entrada para la hora del horario -->
+                            <td><input type="text" name="rep{{i}}" value="{{horariosData[i]['rep']}}" title="segundos"/></td>  <!-- Campo de entrada para la duración del horario -->
+                            <td><input type="range" name="vol{{i}}" value="{{horariosData[i]['vol']}}" min="5" max="30"/></td>  <!-- Campo de entrada para el volumen del horario -->
                         </tr>
                         {% endfor %}
                     </table>
                 </div>
-                <p>Total {{nHorariosData}}</p>
-                <button class="button is-block is-info is-fullwidth" name="AddHorarioRow">Añadir Fila</button>
+                <p>Total {{nHorariosData}}</p>  <!-- Muestra el total de horarios -->
+                <button class="button is-block is-info is-fullwidth" name="AddHorarioRow">Añadir Fila</button>  <!-- Botón para añadir una fila nueva a los horarios -->
             </article>
         </div>
         <div class="column is-half is-parent is-vertical p-6">
@@ -45,34 +41,32 @@
                 <div class="table-container">
                     <table class="table is-fullwidth is-striped">
                         <thead>
-                        <th>Indice</th>
-                        <th>Inicio</th>
-                        <th>Fin</th>
+                        <th>Inicio</th>  <!-- Encabezado de la columna Inicio -->
+                        <th>Fin</th>  <!-- Encabezado de la columna Fin -->
                         </thead>
-                        {% for i in range(0, nFestivosData) %}
+                        {% for i in range(0, nFestivosData) %}  <!-- Bucle para iterar sobre los datos de festivos -->
                         <tr>
-                            <td>{{i}}</td>
-                            <td><input type="date" name="festivosIni{{i}}" value="{{festivosData[i][0]}}" min="1970-1-1" max="2050-31-12"></td>
-                            <td><input type="date" name="festivosFin{{i}}" value="{{festivosData[i][1]}}" min="1970-1-1" max="2050-31-12"></td>
+                            <td><input type="date" name="festIni{{i}}" value="{{festData[i][0]}}" min="1970-1-1" max="2050-12-31"></td>  <!-- Campo de entrada para la fecha de inicio del festivo -->
+                            <td><input type="date" name="festFin{{i}}" value="{{festData[i][1]}}" min="1970-1-1" max="2050-12-31"></td>  <!-- Campo de entrada para la fecha de fin del festivo -->
                         </tr>
                         {% endfor %}
                     </table>
                 </div>
-                <p>Total {{nHorariosData}}</p>
-                <button class="button is-block is-info is-fullwidth" name="AddFestivoRow">Añadir Fila</button>
+                <p>Total {{nHorariosData}}</p>  <!-- Muestra el total de festivos -->
+                <button class="button is-block is-info is-fullwidth" name="AddFestivoRow">Añadir Fila</button>  <!-- Botón para añadir una fila nueva a los festivos -->
             </article>
             <article class="tile is-child box p-6">
                 <h3>Carpeta</h3>
-                <input type="number" name="carpeta" value="{{carpeta}}" min=1 max=99/>
+                <input type="number" name="folder" value="{{folder}}" min=1 max=99/>  <!-- Campo de entrada para el número de folder con restricciones de mínimo y máximo -->
             </article>
         </div>
     </div>
     <div class="box">
         <h2 class="subtitle has-text-black">Acciones</h2>
-            <input type="hidden" name="nHorariosDataHidden" value="{{nHorariosData}}"/>
-            <button class="button is-block is-info is-fullwidth" name="GoHome">Volver</button>
-            <button class="button is-block is-warning is-fullwidth" name="Apply">Aplicar cambios</button>
-            <button class="button is-block is-danger is-fullwidth" name="Reload">Recargar</button>
+            <input type="hidden" name="nHorariosDataHidden" value="{{nHorariosData}}"/>  <!-- Campo oculto duplicado para el número de horarios -->
+            <button class="button is-block is-info is-fullwidth" name="GoHome">Volver</button>  <!-- Botón para volver a la página anterior -->
+            <button class="button is-block is-warning is-fullwidth" name="Apply">Aplicar cambios</button>  <!-- Botón para aplicar los cambios -->
+            <button class="button is-block is-danger is-fullwidth" name="Reload">Recargar</button>  <!-- Botón para recargar la página -->
     </div>
 </form>
 {% endblock %}

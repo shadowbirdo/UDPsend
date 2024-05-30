@@ -6,18 +6,18 @@ app = Flask(__name__)
 
 # Test values, should be stored in a file with the appropriate retrieve method.
 class FileSystem:
-    festivosDataFile = [
-        ["2024-05-11", "2024-05-13"],
-        ["2024-06-03", "2024-06-18"],
-        ["2024-11-10", "2024-11-10"]
+    festDataFile = [
+        {"st": "2024-05-11", "ed": "2024-05-13"},
+        {"st": "2024-06-03", "ed": "2024-06-18"},
+        {"st": "2024-11-10", "ed": "2024-11-10"}
     ]
     horariosDataFile = [
-        ["9:30", "45s", "0.8", "1"],
-        ["10:30", "45s", "1", "6"],
-        ["11:30", "60s", "0.6", "3"]
+        {"time": "09:30", "rep": "45s", "vol": "5"},
+        {"time": "10:30", "rep": "45s", "vol": "10"},
+        {"time": "11:30", "rep": "60s", "vol": "5"}
     ]
     yearFile = 2025
-    carpetaFile = 2
+    folderFile = 2
 
 
 File = FileSystem()
@@ -39,45 +39,48 @@ def editData():
 
     # Grab file version
     horariosData = File.horariosDataFile
-    festivosData = File.festivosDataFile
+    festData = File.festDataFile
     year = File.yearFile
-    carpeta = File.carpetaFile
+    folder = File.folderFile
 
     if request.method == 'GET':
         print("GET METHOD CALLED!")
     elif request.method == 'POST':
         if request.form.get("AddFestivoRow") is not None:
-            festivosData.append(["", ""])
+            festData.append({"st": "", "ed": ""})
         elif request.form.get("AddHorarioRow") is not None:
-            horariosData.append(["", "", "", ""])
+            horariosData.append({"time": "", "rep": "", "vol": ""})
         elif request.form.get("GoHome") is not None:
             return redirect(url_for('home'))
         elif request.form.get("Apply") is not None:
-            carpeta = request.form.get("carpeta")
+            folder = request.form.get("folder")
             year = int(request.form.get("year"))
-            for i in range(0, len(festivosData)):
-                festivosData[i][0] = request.form.get("festivosIni"+str(i))
-                festivosData[i][1] = request.form.get("festivosFin"+str(i))
-            print("NEW festivosData", festivosData)
+            for i in range(0, len(festData)):
+                festData[i]["st"] = request.form.get("festIni"+str(i))
+                festData[i]["ed"] = request.form.get("festFin"+str(i))
+            print("NEW festData", festData)
 
             # Send Commands
-            [logic.udp_send(cal) for cal in logic.gen_cal(year, 1)]
-            [print(f"UDP enviado: {cal}") for cal in logic.gen_cal(year, 1)]
-            logic.udp_send(logic.gen_fol(carpeta))
-            print(f"UDP enviado: {logic.gen_fol(carpeta)}")
             logic.udp_send(logic.gen_now())
             print(f"UDP enviado: {logic.gen_now()}")
 
+            logic.udp_send(logic.gen_fol(folder))
+            print(f"UDP enviado: {logic.gen_fol(folder)}")
+
+            [logic.udp_send(cal) for cal in logic.gen_cal(year, 1)]
+            [print(f"UDP enviado: {cal}") for cal in logic.gen_cal(year, 1)]
+
+
             # Save to file
             File.horariosDataFile = horariosData
-            File.festivosDataFile = festivosData
+            File.festDataFile = festData
             File.yearFile = year
-            File.carpetaFile = carpeta
+            File.folderFile = folder
         elif request.form.get("Reload") is not None:
             print("DO THINGS")
 
-    return render_template('editData.html', festivosData=festivosData, nFestivosData=len(festivosData),
-                           horariosData=horariosData, nHorariosData=len(horariosData), year=year, carpeta=carpeta)
+    return render_template('editData.html', festData=festData, nFestivosData=len(festData),
+                           horariosData=horariosData, nHorariosData=len(horariosData), year=year, folder=folder)
 
 
 app.run(debug=True, port=5000)
