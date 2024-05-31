@@ -52,6 +52,7 @@ def gen_cal(year, start_month):
     month_list = 'C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7', 'C8', 'C9', 'CA', 'CB', 'CC'
     day_list = 'L', 'M', 'X', 'J', 'V', 'S', 'D'
     _udpCalY = []
+
     for i in range(12):
         month_index = (start_month + i - 1) % 12
         current_year = year + (start_month + i - 1) // 12
@@ -71,7 +72,17 @@ def gen_cal(year, start_month):
         _udpCalY.append(_udpCalM.ljust(33, '-'))  # Asegurarse de que el string tenga 33 caracteres
 
     return _udpCalY
+def sort_time(timetable):
+    """
+    Ordena el horario por la clave 'time' en orden ascendente.
 
+    Args:
+        timetable (list of dict): Lista de diccionarios con todos los datos del horario.
+
+    Returns:
+        list of dict: Lista de diccionarios ordenada por la clave 'time'.
+    """
+    return sorted(timetable, key=lambda x: x["time"])
 
 def gen_time(timetable):
     """
@@ -83,10 +94,9 @@ def gen_time(timetable):
     Returns:
         Tuple[str, str]: Tupla de 2 cadenas de caracteres: el horario[0] y el nº de tramos[1].
     """
-    _time = [i["time"].replace(':', '') for i in timetable]
+    _time = [i["time"].replace(':', '').zfill(2) for i in sort_time(timetable)]
     _udpTime = 'H' + '-'.join(_time)
-    return _udpTime, f'N{len(_time):02}'
-
+    return _udpTime, f'N{len(_time)}'
 
 def gen_rep(timetable):
     """
@@ -96,26 +106,27 @@ def gen_rep(timetable):
         timetable (list of dict): Lista de diccionarios con todos los datos del horario.
 
     Returns:
-        str: Cadenas de caracteres con el tiempo de reproducción de cada tramo horario.
+        str: Cadena de caracteres con el tiempo de reproducción de cada tramo horario.
     """
-    _rep = sorted(i["rep"].replace('s', '') for i in timetable)
+
+    _rep = [i["rep"].replace('s', '') for i in sort_time(timetable)]
     _udpRep = 'T' + '-'.join(_rep)
     return _udpRep
 
-
 def gen_vol(timetable):
     """
-    Genera una cadena con el tiempo de reproducción de cada tramo horario en el formato adecuado.
+    Genera una cadena con el volumen de cada tramo horario en el formato adecuado.
 
     Args:
         timetable (list of dict): Lista de diccionarios con todos los datos del horario.
 
     Returns:
-        str: Cadenas de caracteres con el tiempo de reproducción de cada tramo horario.
+        str: Cadena de caracteres con el volumen de cada tramo horario.
     """
-    _vol = [i["vol"] for i in timetable]
+    _vol = [i["vol"] for i in sort_time(timetable)]
     _udpVol = 'V' + '-'.join(_vol)
     return _udpVol
+
 
 
 def gen_fol(folder):
