@@ -4,7 +4,6 @@ Make unit test for:
     logic.gen_vol
 
 Change:
-    logic.gen_time, gen_rep & gen_vol should be sorted
 '    logic.gen_cal add festData as argument
 '    unit test for gen_cal
 

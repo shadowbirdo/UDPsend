@@ -9,11 +9,25 @@
     </article>
     <div class="columns p-6">
         <div class="column is-half is-parent is-vertical p-6">
-            <article class="tile is-child box p-6">
-                <h3>Año</h3>
-                <input type="number" name="year" value="{{year}}" min=1970 max=2050/>  <!-- Campo de entrada para el año con restricciones de mínimo y máximo -->
-                <h3>Mes</h3>
-                <input type="number" name="month" value="{{month}}" min=1 max=12/>
+<article class="tile is-child box p-6">
+    <h3>Fecha</h3>
+    <input type="month" id="date" name="date" min="1970-01" max="2100-12" onchange="updateYearMonth()"/>  <!-- Campo de entrada para seleccionar el mes y año -->
+    <input type="hidden" id="year" name="year" value=""/>  <!-- Campo oculto para el año -->
+    <input type="hidden" id="month" name="month" value=""/> <!-- Campo oculto para el mes -->
+</article>
+
+<script>
+function updateYearMonth() {
+    const dateInput = document.getElementById('date').value;
+    if (dateInput) {
+        const [year, month] = dateInput.split('-');
+        document.getElementById('year').value = year;
+        document.getElementById('month').value = month;
+    }
+}
+</script>
+
+
             </article>
             <article class="tile is-child box p-6">
                 <h3>Horarios</h3>
@@ -48,8 +62,8 @@
                         </thead>
                         {% for i in range(0, nFestivosData) %}  <!-- Bucle para iterar sobre los datos de festivos -->
                         <tr>
-                            <td><input type="date" name="festIni{{i}}" value="{{festData[i][0]}}" min="1970-1-1" max="2050-12-31"></td>  <!-- Campo de entrada para la fecha de inicio del festivo -->
-                            <td><input type="date" name="festFin{{i}}" value="{{festData[i][1]}}" min="1970-1-1" max="2050-12-31"></td>  <!-- Campo de entrada para la fecha de fin del festivo -->
+                            <td><input type="date" name="festIni{{i}}" value="{{festData[i][0]}}" min="1970-1-1" max="2100-12-31"></td>  <!-- Campo de entrada para la fecha de inicio del festivo -->
+                            <td><input type="date" name="festFin{{i}}" value="{{festData[i][1]}}" min="1970-1-1" max="2100-12-31"></td>  <!-- Campo de entrada para la fecha de fin del festivo -->
                         </tr>
                         {% endfor %}
                     </table>
