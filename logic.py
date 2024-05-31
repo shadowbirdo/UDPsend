@@ -6,26 +6,26 @@ sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 UDP_IP = '192.168.4.1'
 UDP_PORT = 12345
 
-fest = [
-    {'st': 'fechaInicio', 'ed': 'fechaFin'},
-    {'st': 'fechaInicio', 'ed': 'fechaFin'}
-]
-
 
 def main():
     """
     Función principal.
     """
-    horariosDataFile = [
+    horarios_data_file = [
         {"time": "09:30", "rep": "45s", "vol": "5"},
         {"time": "10:30", "rep": "45s", "vol": "10"},
         {"time": "11:30", "rep": "60s", "vol": "5"}
     ]
-    print(gen_time(horariosDataFile))
+    fest_data_file = [
+        {"st": "2024-05-11", "ed": "2024-05-13"},
+        {"st": "2024-06-03", "ed": "2024-06-18"},
+        {"st": "2024-11-10", "ed": "2024-11-10"}
+    ]
+    print(gen_time(horarios_data_file))
     year = int(input('Año: '))
     start_month = int(input('Mes: '))
-    [print(cal) for cal in gen_cal(year, start_month)]
-    [udp_send(cal) for cal in gen_cal(year, start_month)]
+    [print(cal) for cal in gen_cal(year, start_month, fest_data_file)]
+    [udp_send(cal) for cal in gen_cal(year, start_month, fest_data_file)]
 
 
 def udp_send(msg):
@@ -41,13 +41,14 @@ def udp_send(msg):
     sock.sendto(msg.encode(), (UDP_IP, UDP_PORT))
 
 
-def gen_cal(year, start_month):
+def gen_cal(st_year, st_month, fest):
     """
     Genera una lista de 12 meses en el formato adecuado, comenzando desde un mes y año específicos.
 
     Args:
-        year (int): Año de inicio.
-        start_month (int): Mes de inicio (1-12).
+        st_year (int): Año de inicio.
+        st_month (int): Mes de inicio (1-12).
+        fest (list of dict): Días festivos.
 
     Returns:
         List[str]: Lista de 12 cadenas de caracteres, cada una representando un mes.
@@ -56,24 +57,28 @@ def gen_cal(year, start_month):
     day_list = 'L', 'M', 'X', 'J', 'V', 'S', 'D'
     _udpCalY = []
     for i in range(12):
-        month_index = (start_month + i - 1) % 12
-        current_year = year + (start_month + i - 1) // 12
+        month_index = (st_month + i - 1) % 12
+        cur_year = st_year + (st_month + i - 1) // 12
         _udpCalM = month_list[month_index]
 
-        for day in range(1, 32):  # Siempre hasta 31 días
+        for day in range(1, 32):  # Días del 1 al 31
             try:
-                _date = datetime(current_year, month_index + 1, day)
+                _date = datetime(cur_year, month_index + 1, day)
                 _day = day_list[_date.weekday()]
-                if _date.strftime('%Y-%m-%d') in fest:
-                    _udpCalM += fest[_date.strftime('%Y-%m-%d')]
+                _date_str = _date.strftime('%Y-%m-%d')
+
+                if any(datetime.strptime(j['st'], '%Y-%m-%d').date() <= _date.date() <= datetime.strptime(j['ed'], '%Y-%m-%d').date() for j in fest):
+                    _udpCalM += 'F'
                 else:
                     _udpCalM += _day
             except ValueError:
-                _udpCalM += '-'
+                pass  # No hacer nada, ya que el día es inválido
 
         _udpCalY.append(_udpCalM.ljust(33, '-'))  # Asegurarse de que el string tenga 33 caracteres
 
     return _udpCalY
+
+
 def sort_time(timetable):
     """
     Ordena el horario por la clave 'time' en orden ascendente.
@@ -85,6 +90,7 @@ def sort_time(timetable):
         list of dict: Lista de diccionarios ordenada por la clave 'time'.
     """
     return sorted(timetable, key=lambda x: x["time"])
+
 
 def gen_time(timetable):
     """
@@ -98,7 +104,8 @@ def gen_time(timetable):
     """
     _time = [i["time"].replace(':', '').zfill(2) for i in sort_time(timetable)]
     _udpTime = 'H' + '-'.join(_time)
-    return _udpTime, f'N{len(_time)}'
+    return _udpTime, f'N{str(len(_time)).zfill(2)}'
+
 
 def gen_rep(timetable):
     """

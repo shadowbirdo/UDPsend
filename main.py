@@ -83,8 +83,8 @@ def editData():
             logic.udp_send(logic.gen_vol(horariosData))
             print(f"UDP enviado: {logic.gen_vol(horariosData)}")
 
-            [logic.udp_send(cal) for cal in logic.gen_cal(year, month)]
-            [print(f"UDP enviado: {cal}") for cal in logic.gen_cal(year, month)]
+            [logic.udp_send(cal) for cal in logic.gen_cal(year, month, festData)]
+            [print(f"UDP enviado: {cal}") for cal in logic.gen_cal(year, month, festData)]
 
             # Save to file
             File.horariosDataFile = horariosData

@@ -48,8 +48,8 @@
                         </thead>
                         {% for i in range(0, nFestivosData) %}  <!-- Bucle para iterar sobre los datos de festivos -->
                         <tr>
-                            <td><input type="date" name="festIni{{i}}" value="{{festData[i][0]}}" min="1970-1-1" max="2050-12-31"></td>  <!-- Campo de entrada para la fecha de inicio del festivo -->
-                            <td><input type="date" name="festFin{{i}}" value="{{festData[i][1]}}" min="1970-1-1" max="2050-12-31"></td>  <!-- Campo de entrada para la fecha de fin del festivo -->
+                            <td><input type="date" name="festIni{{i}}" value="{{festData[i]['st']}}" min="1970-1-1" max="2050-12-31"></td>  <!-- Campo de entrada para la fecha de inicio del festivo -->
+                            <td><input type="date" name="festFin{{i}}" value="{{festData[i]['ed']}}" min="1970-1-1" max="2050-12-31"></td>  <!-- Campo de entrada para la fecha de fin del festivo -->
                         </tr>
                         {% endfor %}
                     </table>

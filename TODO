@@ -1,15 +1,7 @@
-Make unit test for:
-    logic.gen_time
-    logic.gen_rep
-    logic.gen_vol
+Unit tests:
 
 Change:
-    logic.gen_time, gen_rep & gen_vol should be sorted
-'    logic.gen_cal add festData as argument
-'    unit test for gen_cal
-
-New:
-    take "year" & "month" from input type "date" (not "number")
-    make css local
-    clean up main.py
+    tidy up main.py & logic.py
     chose better name
+New:
+    implement file system
