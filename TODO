@@ -5,8 +5,8 @@ Make unit test for:
 
 Change:
     logic.gen_time, gen_rep & gen_vol should be sorted
-    logic.gen_cal add festData as argument
-    logic.gen_rep & gen_vol should be filled with "0" if len(str) != 2
+'    logic.gen_cal add festData as argument
+'    unit test for gen_cal
 
 New:
     take "year" & "month" from input type "date" (not "number")

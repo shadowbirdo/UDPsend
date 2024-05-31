@@ -6,7 +6,10 @@ sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 UDP_IP = '192.168.4.1'
 UDP_PORT = 12345
 
-fest = {'2024-01-01': 'F', '2024-12-25': 'F'}
+fest = [
+    {'st': 'fechaInicio', 'ed': 'fechaFin'},
+    {'st': 'fechaInicio', 'ed': 'fechaFin'}
+]
 
 
 def main():
@@ -98,7 +101,7 @@ def gen_rep(timetable):
     Returns:
         str: Cadenas de caracteres con el tiempo de reproducción de cada tramo horario.
     """
-    _rep = sorted(i["rep"].replace('s', '') for i in timetable)
+    _rep = [i["rep"].replace('s', '').zfill(3) for i in timetable]
     _udpRep = 'T' + '-'.join(_rep)
     return _udpRep
 
@@ -128,7 +131,7 @@ def gen_fol(folder):
     Returns:
         str: Nombre de la carpeta formateado con una "F" al inicio y con un cero a la izquierda si es necesario.
     """
-    return f'F{len(folder):02}'
+    return f'F{folder.zfill(2)}'
 
 
 def gen_now():
