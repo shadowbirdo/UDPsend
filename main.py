@@ -17,6 +17,7 @@ class FileSystem:
         {"time": "11:30", "rep": "60s", "vol": "5"}
     ]
     yearFile = 2025
+    monthFile = 1
     folderFile = 2
 
 
@@ -41,6 +42,7 @@ def editData():
     horariosData = File.horariosDataFile
     festData = File.festDataFile
     year = File.yearFile
+    month = File.monthFile
     folder = File.folderFile
 
     if request.method == 'GET':
@@ -55,6 +57,11 @@ def editData():
         elif request.form.get("Apply") is not None:
             folder = request.form.get("folder")
             year = int(request.form.get("year"))
+            month = int(request.form.get("month"))
+            for i in range(0, len(horariosData)):
+                horariosData[i]["time"] = request.form.get("time"+str(i))
+                horariosData[i]["rep"] = request.form.get("rep"+str(i))
+                horariosData[i]["vol"] = request.form.get("vol"+str(i))
             for i in range(0, len(festData)):
                 festData[i]["st"] = request.form.get("festIni"+str(i))
                 festData[i]["ed"] = request.form.get("festFin"+str(i))
@@ -67,14 +74,23 @@ def editData():
             logic.udp_send(logic.gen_fol(folder))
             print(f"UDP enviado: {logic.gen_fol(folder)}")
 
-            [logic.udp_send(cal) for cal in logic.gen_cal(year, 1)]
-            [print(f"UDP enviado: {cal}") for cal in logic.gen_cal(year, 1)]
+            [logic.udp_send(tim) for tim in logic.gen_time(horariosData)]
+            [print(f"UDP enviado: {tim}") for tim in logic.gen_time(horariosData)]
 
+            logic.udp_send(logic.gen_rep(horariosData))
+            print(f"UDP enviado: {logic.gen_rep(horariosData)}")
+
+            logic.udp_send(logic.gen_vol(horariosData))
+            print(f"UDP enviado: {logic.gen_vol(horariosData)}")
+
+            [logic.udp_send(cal) for cal in logic.gen_cal(year, month)]
+            [print(f"UDP enviado: {cal}") for cal in logic.gen_cal(year, month)]
 
             # Save to file
             File.horariosDataFile = horariosData
             File.festDataFile = festData
             File.yearFile = year
+            File.monthFile = month
             File.folderFile = folder
         elif request.form.get("Reload") is not None:
             print("DO THINGS")

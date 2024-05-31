@@ -13,7 +13,12 @@ def main():
     """
     Función principal.
     """
-    print(gen_now())
+    horariosDataFile = [
+        {"time": "09:30", "rep": "45s", "vol": "5"},
+        {"time": "10:30", "rep": "45s", "vol": "10"},
+        {"time": "11:30", "rep": "60s", "vol": "5"}
+    ]
+    print(gen_time(horariosDataFile))
     year = int(input('Año: '))
     start_month = int(input('Mes: '))
     [print(cal) for cal in gen_cal(year, start_month)]
@@ -78,7 +83,9 @@ def gen_time(timetable):
     Returns:
         Tuple[str, str]: Tupla de 2 cadenas de caracteres: el horario[0] y el nº de tramos[1].
     """
-    ...
+    _time = [i["time"].replace(':', '') for i in timetable]
+    _udpTime = 'H' + '-'.join(_time)
+    return _udpTime, f'N{len(_time):02}'
 
 
 def gen_rep(timetable):
@@ -91,7 +98,9 @@ def gen_rep(timetable):
     Returns:
         str: Cadenas de caracteres con el tiempo de reproducción de cada tramo horario.
     """
-    ...
+    _rep = sorted(i["rep"].replace('s', '') for i in timetable)
+    _udpRep = 'T' + '-'.join(_rep)
+    return _udpRep
 
 
 def gen_vol(timetable):
@@ -104,7 +113,9 @@ def gen_vol(timetable):
     Returns:
         str: Cadenas de caracteres con el tiempo de reproducción de cada tramo horario.
     """
-    ...
+    _vol = [i["vol"] for i in timetable]
+    _udpVol = 'V' + '-'.join(_vol)
+    return _udpVol
 
 
 def gen_fol(folder):
@@ -117,9 +128,7 @@ def gen_fol(folder):
     Returns:
         str: Nombre de la carpeta formateado con una "F" al inicio y con un cero a la izquierda si es necesario.
     """
-    if len(f'{folder}') == 1:
-        folder = '0' + folder
-    return f'F{folder}'
+    return f'F{len(folder):02}'
 
 
 def gen_now():
