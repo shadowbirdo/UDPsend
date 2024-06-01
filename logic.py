@@ -72,6 +72,7 @@ def gen_cal(st_year, st_month, fest):
                 else:
                     _udpCalM += _day
             except ValueError:
+                print('Error. Probablemente sea por los festivos.')
                 pass  # No hacer nada, ya que el día es inválido
 
         _udpCalY.append(_udpCalM.ljust(33, '-'))  # Asegurarse de que el string tenga 33 caracteres
@@ -148,7 +149,7 @@ def gen_fol(folder):
     Returns:
         str: Nombre de la carpeta formateado con una "F" al inicio y con un cero a la izquierda si es necesario.
     """
-    return f'F{folder.zfill(2)}'
+    return f'F{str(folder).zfill(2)}'
 
 
 def gen_now():

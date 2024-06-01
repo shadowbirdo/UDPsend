@@ -1,96 +1,76 @@
 {% extends "base.html" %}  <!-- Extiende la plantilla base -->
 
 {% block content %}
+
+{% set month_names = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+                        "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"] %}
+
 <form action="{{url_for('editData')}}" method="POST">  <!-- Formulario que envía los datos al endpoint 'editData' usando el método POST -->
-    <input type="hidden" name="nFestivosDataHidden" value="{{nFestivosData}}"/>  <!-- Campo oculto para el número de festivos -->
-    <input type="hidden" name="nHorariosDataHidden" value="{{nHorariosData}}"/>  <!-- Campo oculto para el número de horarios -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+        <div class="notification is-{{category}}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    {% endif %}
+    {% endwith %}
     <article class="tile is-child box p-6">
         <label><b>Editar Datos</b></label>  <!-- Etiqueta de encabezado para la sección de edición de datos -->
     </article>
     <div class="columns p-6">
         <div class="column is-half is-parent is-vertical p-6">
-    <article class="tile is-child box p-6">
-        <h3>Fecha</h3>
-        <!-- Selectores personalizados para mes y año -->
-        <select id="month" class="selector" onchange="updateYearMonth()">
-            <option value="">Mes</option>
-            <option value="01">Enero</option>
-            <option value="02">Febrero</option>
-            <option value="03">Marzo</option>
-            <option value="04">Abril</option>
-            <option value="05">Mayo</option>
-            <option value="06">Junio</option>
-            <option value="07">Julio</option>
-            <option value="08">Agosto</option>
-            <option value="09">Septiembre</option>
-            <option value="10">Octubre</option>
-            <option value="11">Noviembre</option>
-            <option value="12">Diciembre</option>
-        </select>
-        <select id="year" class="selector" onchange="updateYearMonth()">
-            <option value="">Año</option>
-            <!-- Se pueden añadir más años según sea necesario -->
-            <script>
-                // Generar opciones de año dinámicamente
-                const yearSelect = document.getElementById('year');
-                for (let year = 2023; year <= 2100; year++) {
-                    let option = document.createElement('option');
-                    option.value = year;
-                    option.textContent = year;
-                    yearSelect.appendChild(option);
-                }
-            </script>
-        </select>
-
-        <input type="hidden" id="hiddenYear" name="year" value=""/>  <!-- Campo oculto para el año -->
-        <input type="hidden" id="hiddenMonth" name="month" value=""/> <!-- Campo oculto para el mes -->
-    </article>
-
-    <script>
-        function updateYearMonth() {
-            const year = document.getElementById('year').value;
-            const month = document.getElementById('month').value;
-            document.getElementById('hiddenYear').value = year;
-            document.getElementById('hiddenMonth').value = month;
-        }
-    </script>
-
-
+            <article class="tile is-child box p-6">
+                <h3>Fecha</h3>
+                <!-- Selectores personalizados para mes y año -->
+                <select id="month" name="month" class="selector">
+                    {% for i in range(12): %}
+                        <option {{ 'selected' if i == month else '' }} value="{{ i }}">
+                            {{ month_names[i] }}
+                        </option>
+                    {% endfor %}
+                </select>
+                <select id="year" name="year" class="selector">
+                    {% for i in range(2023, 2076): %}
+                        <option value="{{ i }}" {{'selected' if i == year else '' }}>
+                            {{ i }}
+                        </option>
+                    {% endfor %}
+                </select>
             </article>
             <article class="tile is-child box p-6">
-                                <h3>Festivos</h3>
+                <h3>Festivos</h3>
                 <div class="table-container">
                     <table class="table is-fullwidth is-striped">
                         <thead>
-                        <th>Inicio</th>  <!-- Encabezado de la columna Inicio -->
-                        <th>Fin</th>  <!-- Encabezado de la columna Fin -->
+                            <th>Inicio</th>  <!-- Encabezado de la columna Inicio -->
+                            <th>Fin</th>  <!-- Encabezado de la columna Fin -->
                         </thead>
                         {% for i in range(0, nFestivosData) %}  <!-- Bucle para iterar sobre los datos de festivos -->
-                        <tr>
-                            <td><input type="date" name="festIni{{i}}" value="{{festData[i]['st']}}" min="2023-1-1" max="2100-12-31"></td>  <!-- Campo de entrada para la fecha de inicio del festivo -->
-                            <td><input type="date" name="festFin{{i}}" value="{{festData[i]['ed']}}" min="2023-1-1" max="2100-12-31"></td>  <!-- Campo de entrada para la fecha de fin del festivo -->
-                        </tr>
+                            <tr>
+                                <td><input type="date" name="festIni{{i}}" value="{{festData[i]['st']}}" min="2023-1-1" max="2100-12-31"></td>  <!-- Campo de entrada para la fecha de inicio del festivo -->
+                                <td><input type="date" name="festFin{{i}}" value="{{festData[i]['ed']}}" min="2023-1-1" max="2100-12-31"></td>  <!-- Campo de entrada para la fecha de fin del festivo -->
+                            </tr>
                         {% endfor %}
                     </table>
                 </div>
                 <button class="button is-block is-info is-fullwidth" name="AddFestivoRow">Añadir Fila</button>  <!-- Botón para añadir una fila nueva a los festivos -->
-
+                <button class="button is-block is-danger is-fullwidth" name="PopFestivoRow">Eliminar Fila</button>
             </article>
-
         </div>
         <div class="column is-half is-parent is-vertical p-6">
              <article class="tile is-child box p-6">
                 <h3>Carpeta</h3>
                 <input type="number" name="folder" value="{{folder}}" min=1 max=99/>  <!-- Campo de entrada para el número de folder con restricciones de mínimo y máximo -->
-            </article>
-            <article class="tile is-child box p-6">
-  <h3>Horarios</h3>
+             </article>
+             <article class="tile is-child box p-6">
+                <h3>Horarios</h3>
                 <div class="table-container">
                     <table class="table is-fullwidth is-striped">
                         <thead>
-                        <th>Hora</th>  <!-- Encabezado de la columna Hora -->
-                        <th>Duración</th>  <!-- Encabezado de la columna Duración -->
-                        <th>Volumen</th>  <!-- Encabezado de la columna Volumen -->
+                            <th>Hora</th>  <!-- Encabezado de la columna Hora -->
+                            <th>Duración</th>  <!-- Encabezado de la columna Duración -->
+                            <th>Volumen</th>  <!-- Encabezado de la columna Volumen -->
                         </thead>
                         {% for i in range(0, nHorariosData) %}  <!-- Bucle para iterar sobre los datos de horarios -->
                         <tr>
@@ -102,16 +82,14 @@
                     </table>
                 </div>
                 <button class="button is-block is-info is-fullwidth" name="AddHorarioRow">Añadir Fila</button>  <!-- Botón para añadir una fila nueva a los horarios -->
+                <button class="button is-block is-danger is-fullwidth" name="PopHorarioRow">Eliminar Fila</button>
             </article>
-
         </div>
     </div>
     <div class="box">
         <h2 class="subtitle has-text-black">Acciones</h2>
-            <input type="hidden" name="nHorariosDataHidden" value="{{nHorariosData}}"/>  <!-- Campo oculto duplicado para el número de horarios -->
-            <button class="button is-block is-info is-fullwidth" name="GoHome">Volver</button>  <!-- Botón para volver a la página anterior -->
-            <button class="button is-block is-warning is-fullwidth" name="Apply">Aplicar cambios</button>  <!-- Botón para aplicar los cambios -->
-            <button class="button is-block is-danger is-fullwidth" name="Reload">Recargar</button>  <!-- Botón para recargar la página -->
+        <input type="hidden" name="nHorariosDataHidden" value="{{nHorariosData}}"/>  <!-- Campo oculto duplicado para el número de horarios -->
+        <button class="button is-block is-warning is-fullwidth" name="Apply">Aplicar cambios</button>  <!-- Botón para aplicar los cambios -->
     </div>
 </form>
 {% endblock %}

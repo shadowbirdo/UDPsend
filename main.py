@@ -1,8 +1,9 @@
 import logic
 import json
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, flash
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = 'PARALELEPIPEDO'
 
 
 # Test values, should be stored in a file with the appropriate retrieve method.
@@ -62,17 +63,7 @@ class FileSystem:
 File = FileSystem()
 
 
-@app.route("/", methods=['GET'])
-def home():
-    print("Home Route with method: " + request.method)
-    if request.method == 'GET':
-        if request.args.get("GoToEditData") is not None:
-            return redirect(url_for('editData'))
-        else:
-            return render_template('home.html')
-
-
-@app.route("/editData", methods=['GET', 'POST'])
+@app.route("/", methods=['GET', 'POST'])
 def editData():
     print("EditData Route")
 
@@ -80,30 +71,40 @@ def editData():
     horariosData = File.horariosDataFile
     festData = File.festDataFile
     year = File.yearFile
-    month = File.monthFile
+    month = File.monthFile - 1
     folder = File.folderFile
 
     if request.method == 'GET':
         print("GET METHOD CALLED!")
+        return render_template('editData.html', festData=festData, nFestivosData=len(festData),
+                               horariosData=horariosData, nHorariosData=len(horariosData), year=year, month=month,
+                               folder=folder)
     elif request.method == 'POST':
         if request.form.get("AddFestivoRow") is not None:
             festData.append({"st": "", "ed": ""})
+        elif request.form.get("PopFestivoRow") is not None:
+            festData.pop()
         elif request.form.get("AddHorarioRow") is not None:
             horariosData.append({"time": "", "rep": "", "vol": ""})
-        elif request.form.get("GoHome") is not None:
-            return redirect(url_for('home'))
+        elif request.form.get("PopHorarioRow") is not None:
+            horariosData.pop()
         elif request.form.get("Apply") is not None:
-            folder = request.form.get("folder")
+            folder = int(request.form.get("folder"))
             year = int(request.form.get("year"))
             month = int(request.form.get("month"))
             for i in range(0, len(horariosData)):
-                horariosData[i]["time"] = request.form.get("time"+str(i))
-                horariosData[i]["rep"] = request.form.get("rep"+str(i))
-                horariosData[i]["vol"] = request.form.get("vol"+str(i))
+                horariosData[i]["time"] = request.form.get("time" + str(i))
+                horariosData[i]["rep"] = request.form.get("rep" + str(i))
+                horariosData[i]["vol"] = request.form.get("vol" + str(i))
             for i in range(0, len(festData)):
-                festData[i]["st"] = request.form.get("festIni"+str(i))
-                festData[i]["ed"] = request.form.get("festFin"+str(i))
-            print("NEW festData", festData)
+                festData[i]["st"] = request.form.get("festIni" + str(i))
+                festData[i]["ed"] = request.form.get("festFin" + str(i))
+
+            # Flash Messages
+            if 0 <= folder <= 100:
+                flash('Operation completed successfully!', 'success')
+            else:
+                flash('Error', 'danger')
 
             # Send Commands
             logic.udp_send(logic.gen_now())
@@ -128,17 +129,13 @@ def editData():
             File.horariosDataFile = horariosData
             File.festDataFile = festData
             File.yearFile = year
-            File.monthFile = month
+            File.monthFile = month + 1
             File.folderFile = folder
 
             # Save data to JSON
             File.save_data()
 
-        elif request.form.get("Reload") is not None:
-            print("DO THINGS")
-
-    return render_template('editData.html', festData=festData, nFestivosData=len(festData),
-                           horariosData=horariosData, nHorariosData=len(horariosData), year=year, folder=folder)
+        return redirect(url_for('editData'))
 
 
 app.run(debug=True, port=5000)
