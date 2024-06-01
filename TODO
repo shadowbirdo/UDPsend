@@ -1,7 +1,7 @@
 Unit tests:
-
+    main.py?
 Change:
     tidy up main.py & logic.py
     chose better name
+    make 'Fecha' store default values in html
 New:
-    implement file system

@@ -1,4 +1,5 @@
 import logic
+import json
 from flask import Flask, render_template, request, redirect, url_for
 
 app = Flask(__name__)
@@ -6,19 +7,56 @@ app = Flask(__name__)
 
 # Test values, should be stored in a file with the appropriate retrieve method.
 class FileSystem:
-    festDataFile = [
-        {"st": "2024-05-11", "ed": "2024-05-13"},
-        {"st": "2024-06-03", "ed": "2024-06-18"},
-        {"st": "2024-11-10", "ed": "2024-11-10"}
-    ]
-    horariosDataFile = [
-        {"time": "09:30", "rep": "45s", "vol": "5"},
-        {"time": "10:30", "rep": "45s", "vol": "10"},
-        {"time": "11:30", "rep": "60s", "vol": "5"}
-    ]
-    yearFile = 2025
-    monthFile = 1
-    folderFile = 2
+    def __init__(self):
+        self.data = self.load_data()
+
+    def load_data(self):
+        with open('data.json', 'r') as file:
+            return json.load(file)
+
+    def save_data(self):
+        with open('data.json', 'w') as file:
+            json.dump(self.data, file, indent=4)
+
+    @property
+    def festDataFile(self):
+        return self.data['festDataFile']
+
+    @festDataFile.setter
+    def festDataFile(self, value):
+        self.data['festDataFile'] = value
+
+    @property
+    def horariosDataFile(self):
+        return self.data['horariosDataFile']
+
+    @horariosDataFile.setter
+    def horariosDataFile(self, value):
+        self.data['horariosDataFile'] = value
+
+    @property
+    def yearFile(self):
+        return self.data['yearFile']
+
+    @yearFile.setter
+    def yearFile(self, value):
+        self.data['yearFile'] = value
+
+    @property
+    def monthFile(self):
+        return self.data['monthFile']
+
+    @monthFile.setter
+    def monthFile(self, value):
+        self.data['monthFile'] = value
+
+    @property
+    def folderFile(self):
+        return self.data['folderFile']
+
+    @folderFile.setter
+    def folderFile(self, value):
+        self.data['folderFile'] = value
 
 
 File = FileSystem()
@@ -92,6 +130,10 @@ def editData():
             File.yearFile = year
             File.monthFile = month
             File.folderFile = folder
+
+            # Save data to JSON
+            File.save_data()
+
         elif request.form.get("Reload") is not None:
             print("DO THINGS")
 
