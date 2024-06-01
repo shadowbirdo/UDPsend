@@ -58,7 +58,33 @@
 
             </article>
             <article class="tile is-child box p-6">
-                <h3>Horarios</h3>
+                                <h3>Festivos</h3>
+                <div class="table-container">
+                    <table class="table is-fullwidth is-striped">
+                        <thead>
+                        <th>Inicio</th>  <!-- Encabezado de la columna Inicio -->
+                        <th>Fin</th>  <!-- Encabezado de la columna Fin -->
+                        </thead>
+                        {% for i in range(0, nFestivosData) %}  <!-- Bucle para iterar sobre los datos de festivos -->
+                        <tr>
+                            <td><input type="date" name="festIni{{i}}" value="{{festData[i]['st']}}" min="2023-1-1" max="2100-12-31"></td>  <!-- Campo de entrada para la fecha de inicio del festivo -->
+                            <td><input type="date" name="festFin{{i}}" value="{{festData[i]['ed']}}" min="2023-1-1" max="2100-12-31"></td>  <!-- Campo de entrada para la fecha de fin del festivo -->
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+                <button class="button is-block is-info is-fullwidth" name="AddFestivoRow">Añadir Fila</button>  <!-- Botón para añadir una fila nueva a los festivos -->
+
+            </article>
+
+        </div>
+        <div class="column is-half is-parent is-vertical p-6">
+             <article class="tile is-child box p-6">
+                <h3>Carpeta</h3>
+                <input type="number" name="folder" value="{{folder}}" min=1 max=99/>  <!-- Campo de entrada para el número de folder con restricciones de mínimo y máximo -->
+            </article>
+            <article class="tile is-child box p-6">
+  <h3>Horarios</h3>
                 <div class="table-container">
                     <table class="table is-fullwidth is-striped">
                         <thead>
@@ -75,34 +101,9 @@
                         {% endfor %}
                     </table>
                 </div>
-                <p>Total {{nHorariosData}}</p>  <!-- Muestra el total de horarios -->
                 <button class="button is-block is-info is-fullwidth" name="AddHorarioRow">Añadir Fila</button>  <!-- Botón para añadir una fila nueva a los horarios -->
             </article>
-        </div>
-        <div class="column is-half is-parent is-vertical p-6">
-            <article class="tile is-child box p-6">
-                <h3>Festivos</h3>
-                <div class="table-container">
-                    <table class="table is-fullwidth is-striped">
-                        <thead>
-                        <th>Inicio</th>  <!-- Encabezado de la columna Inicio -->
-                        <th>Fin</th>  <!-- Encabezado de la columna Fin -->
-                        </thead>
-                        {% for i in range(0, nFestivosData) %}  <!-- Bucle para iterar sobre los datos de festivos -->
-                        <tr>
-                            <td><input type="date" name="festIni{{i}}" value="{{festData[i]['st']}}" min="2023-1-1" max="2100-12-31"></td>  <!-- Campo de entrada para la fecha de inicio del festivo -->
-                            <td><input type="date" name="festFin{{i}}" value="{{festData[i]['ed']}}" min="2023-1-1" max="2100-12-31"></td>  <!-- Campo de entrada para la fecha de fin del festivo -->
-                        </tr>
-                        {% endfor %}
-                    </table>
-                </div>
-                <p>Total {{nHorariosData}}</p>  <!-- Muestra el total de festivos -->
-                <button class="button is-block is-info is-fullwidth" name="AddFestivoRow">Añadir Fila</button>  <!-- Botón para añadir una fila nueva a los festivos -->
-            </article>
-            <article class="tile is-child box p-6">
-                <h3>Carpeta</h3>
-                <input type="number" name="folder" value="{{folder}}" min=1 max=99/>  <!-- Campo de entrada para el número de folder con restricciones de mínimo y máximo -->
-            </article>
+
         </div>
     </div>
     <div class="box">
