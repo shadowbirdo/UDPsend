@@ -5,7 +5,7 @@
 {% set month_names = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
                         "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"] %}
 
-<form action="{{url_for('editData')}}" method="POST">  <!-- Formulario que envía los datos al endpoint 'editData' usando el método POST -->
+<form action="{{url_for('editData')}}" method="POST" xmlns:border-color="http://www.w3.org/1999/xhtml">  <!-- Formulario que envía los datos al endpoint 'editData' usando el método POST -->
     {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
         {% for category, message in messages %}
@@ -54,8 +54,8 @@
                         {% endfor %}
                     </table>
                 </div>
-                <button class="button is-block is-info is-fullwidth" name="AddFestivoRow">Añadir Fila</button>  <!-- Botón para añadir una fila nueva a los festivos -->
-                <button class="button is-block is-danger is-fullwidth" name="PopFestivoRow">Eliminar Fila</button>
+                <button style= "background-color:red; color:white" class="button is-block is-info is-fullwidth" name="AddFestivoRow">Añadir Fila</button>  <!-- Botón para añadir una fila nueva a los festivos -->
+                <button style= "background-color:red; color:white" class="button is-block is-danger is-fullwidth" name="PopFestivoRow">Eliminar Fila</button>
             </article>
         </div>
         <div class="column is-half is-parent is-vertical p-6">
@@ -81,15 +81,15 @@
                         {% endfor %}
                     </table>
                 </div>
-                <button class="button is-block is-info is-fullwidth" name="AddHorarioRow">Añadir Fila</button>  <!-- Botón para añadir una fila nueva a los horarios -->
-                <button class="button is-block is-danger is-fullwidth" name="PopHorarioRow">Eliminar Fila</button>
+                <button style= "background-color:red; color:white" class="button is-block is-info is-fullwidth" name="AddHorarioRow">Añadir Fila</button>  <!-- Botón para añadir una fila nueva a los horarios -->
+                <button style= "background-color:red; color:white" class="button is-block is-danger is-fullwidth" name="PopHorarioRow">Eliminar Fila</button>
             </article>
         </div>
     </div>
     <div class="box">
         <h2 class="subtitle has-text-black">Acciones</h2>
         <input type="hidden" name="nHorariosDataHidden" value="{{nHorariosData}}"/>  <!-- Campo oculto duplicado para el número de horarios -->
-        <button class="button is-block is-warning is-fullwidth" name="Apply">Aplicar cambios</button>  <!-- Botón para aplicar los cambios -->
+        <button style= "background-color:red; color:white" class="button is-block is-warning is-fullwidth" name="Apply">Aplicar cambios</button>  <!-- Botón para aplicar los cambios -->
     </div>
 </form>
 {% endblock %}
