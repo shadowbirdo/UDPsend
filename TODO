@@ -4,4 +4,7 @@ Change:
     tidy up main.py & logic.py
     chose better name
 New:
-   error management
+    error management:
+        dont save blank inputs
+        limit folder input
+        dont reset values un new line

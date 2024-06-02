@@ -77,28 +77,42 @@ def editData():
     if request.method == 'GET':
         print("GET METHOD CALLED!")
         return render_template('editData.html', festData=festData, nFestivosData=len(festData),
-                               horariosData=horariosData, nHorariosData=len(horariosData), year=year, month=month,
-                               folder=folder)
+                                       horariosData=horariosData, nHorariosData=len(horariosData), year=year,
+                                       month=month, folder=folder)
     elif request.method == 'POST':
         if request.form.get("AddFestivoRow") is not None:
             festData.append({"st": "", "ed": ""})
+            for i in range(0, len(festData)):
+                if not request.form.get("festIni" + str(i)) == request.form.get("festFin" + str(i)) == "":
+                    festData[i]["st"] = request.form.get("festIni" + str(i))
+                    festData[i]["ed"] = request.form.get("festFin" + str(i))
         elif request.form.get("PopFestivoRow") is not None:
             festData.pop()
         elif request.form.get("AddHorarioRow") is not None:
             horariosData.append({"time": "", "rep": "", "vol": ""})
+            print(request.form)
+            for i in range(len(horariosData)):
+                if not request.form.get("time" + str(i)) == request.form.get("rep" + str(i)) == "":
+                    horariosData[i]["time"] = request.form.get("time" + str(i))
+                    horariosData[i]["rep"] = request.form.get("rep" + str(i)) if request.form.get("rep" + str(i)) is not None else ""
+                    horariosData[i]["vol"] = request.form.get("vol" + str(i))
         elif request.form.get("PopHorarioRow") is not None:
             horariosData.pop()
         elif request.form.get("Apply") is not None:
             folder = int(request.form.get("folder"))
             year = int(request.form.get("year"))
             month = int(request.form.get("month"))
-            for i in range(0, len(horariosData)):
-                horariosData[i]["time"] = request.form.get("time" + str(i))
-                horariosData[i]["rep"] = request.form.get("rep" + str(i))
-                horariosData[i]["vol"] = request.form.get("vol" + str(i))
+            for i in range(len(horariosData)):
+                if not request.form.get("time" + str(i)) == request.form.get("rep" + str(i)) == "":
+                    horariosData[i]["time"] = request.form.get("time" + str(i))
+                    horariosData[i]["rep"] = request.form.get("rep" + str(i))
+                    horariosData[i]["vol"] = request.form.get("vol" + str(i))
+                elif request.form.get("time" + str(i)) == request.form.get("rep" + str(i)) == "":
+                    horariosData.pop()
             for i in range(0, len(festData)):
-                festData[i]["st"] = request.form.get("festIni" + str(i))
-                festData[i]["ed"] = request.form.get("festFin" + str(i))
+                if not request.form.get("festIni" + str(i)) == request.form.get("festFin" + str(i)) == "":
+                    festData[i]["st"] = request.form.get("festIni" + str(i))
+                    festData[i]["ed"] = request.form.get("festFin" + str(i))
 
             # Flash Messages
             if 0 <= folder <= 100:
