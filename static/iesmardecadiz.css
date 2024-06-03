@@ -6001,6 +6001,8 @@ a.panel-block:hover,label.panel-block:hover {
     flex-grow: 1;
     flex-shrink: 1;
     padding: .75rem
+
+
 }
 
 .columns.is-mobile>.column.is-narrow {
@@ -11265,12 +11267,22 @@ a.panel-block:hover,label.panel-block:hover {
         --bulma-grid-cell-row-span: 12
     }
 }
+.logomar {
+
+        margin-top: 10px;
+
+
+}
+
+.center-image {
+}
 
 .container {
     flex-grow: 1;
     margin: 0 auto;
     position: relative;
     width: 100%
+
 }
 
 .container.is-fluid {
@@ -11331,7 +11343,7 @@ a.panel-block:hover,label.panel-block:hover {
 }
 
 .hero .navbar {
-    background: none
+    background: #54497a
 }
 
 .hero .tabs ul {

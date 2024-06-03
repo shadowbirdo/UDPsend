@@ -20,7 +20,7 @@
     </article>
     <div class="columns p-6">
         <div class="column is-half is-parent is-vertical p-6">
-            <article class="tile is-child box p-6">
+            <article class="tile is-child box p-6 " >
                 <h3>Fecha</h3>
                 <!-- Selectores personalizados para mes y año -->
                 <select id="month" name="month" class="selector">
@@ -54,8 +54,8 @@
                         {% endfor %}
                     </table>
                 </div>
-                <button style= "background-color:red; color:white" class="button is-block is-info is-fullwidth" name="AddFestivoRow">Añadir Fila</button>  <!-- Botón para añadir una fila nueva a los festivos -->
-                <button style= "background-color:red; color:white" class="button is-block is-danger is-fullwidth" name="PopFestivoRow">Eliminar Fila</button>
+                <button style= "background-color:#b300ff; color:white" class="button is-block is-info is-fullwidth" name="AddFestivoRow"><b>Añadir Fila</b></button>  <!-- Botón para añadir una fila nueva a los festivos -->
+                <button style= "background-color:Tomato; color:white" class="button is-block is-danger is-fullwidth" name="PopFestivoRow"><b>Eliminar Fila</b></button>
             </article>
         </div>
         <div class="column is-half is-parent is-vertical p-6">
@@ -64,32 +64,49 @@
                 <input type="number" name="folder" value="{{folder}}" min=1 max=99/>  <!-- Campo de entrada para el número de folder con restricciones de mínimo y máximo -->
              </article>
              <article class="tile is-child box p-6">
-                <h3>Horarios</h3>
-                <div class="table-container">
-                    <table class="table is-fullwidth is-striped">
-                        <thead>
-                            <th>Hora</th>  <!-- Encabezado de la columna Hora -->
-                            <th>Duración</th>  <!-- Encabezado de la columna Duración -->
-                            <th>Volumen</th>  <!-- Encabezado de la columna Volumen -->
-                        </thead>
-                        {% for i in range(0, nHorariosData) %}  <!-- Bucle para iterar sobre los datos de horarios -->
-                        <tr>
-                            <td><input type="time" name="time{{i}}" value="{{horariosData[i]['time']}}"/></td>  <!-- Campo de entrada para la hora del horario -->
-                            <td><input type="text" name="rep{{i}}" value="{{horariosData[i]['rep']}}" title="segundos"/></td>  <!-- Campo de entrada para la duración del horario -->
-                            <td><input type="range" name="vol{{i}}" value="{{horariosData[i]['vol']}}" min="5" max="30"/></td>  <!-- Campo de entrada para el volumen del horario -->
-                        </tr>
-                        {% endfor %}
-                    </table>
-                </div>
-                <button style= "background-color:red; color:white" class="button is-block is-info is-fullwidth" name="AddHorarioRow">Añadir Fila</button>  <!-- Botón para añadir una fila nueva a los horarios -->
-                <button style= "background-color:red; color:white" class="button is-block is-danger is-fullwidth" name="PopHorarioRow">Eliminar Fila</button>
-            </article>
+    <h3>Horarios</h3>
+
+    <div class="table-container">
+        <table class="table is-fullwidth is-striped">
+            <thead>
+                <tr>
+                    <th>Hora</th>  <!-- Encabezado de la columna Hora -->
+                    <th>Duración</th>  <!-- Encabezado de la columna Duración -->
+                    <th>Volumen</th>  <!-- Encabezado de la columna Volumen -->
+                </tr>
+            </thead>
+            <tbody>
+                {% for i in range(0, nHorariosData) %}  <!-- Bucle para iterar sobre los datos de horarios -->
+                <tr>
+                    <td><input type="time" name="time{{i}}" value="{{horariosData[i]['time']}}"/></td>  <!-- Campo de entrada para la hora del horario -->
+                    <td><input type="text" name="rep{{i}}" value="{{horariosData[i]['rep']}}" title="segundos"/></td>  <!-- Campo de entrada para la duración del horario -->
+                    <td>
+                        <input type="range" name="vol{{i}}" value="{{horariosData[i]['vol']}}" min="5" max="30" oninput="updateVolume(this, {{i}})"/>
+                        <span id="volPercent{{i}}">{{horariosData[i]['vol']}}%</span>
+                    </td>  <!-- Campo de entrada para el volumen del horario -->
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+    <button style="background-color:#b300ff; color:white" class="button is-block is-info is-fullwidth" name="AddHorarioRow"><b>Añadir Fila</b></button>  <!-- Botón para añadir una fila nueva a los horarios -->
+    <button style="background-color:Tomato; color:white" class="button is-block is-danger is-fullwidth" name="PopHorarioRow"><b>Eliminar Fila</b></button>
+</article>
+
+<script>
+function updateVolume(slider, index) {
+    var volumePercent = document.getElementById('volPercent' + index);
+    volumePercent.textContent = Math.round((((slider.value - 5) / 25) * 100)) + '%';
+}
+</script>
+
         </div>
     </div>
     <div class="box">
         <h2 class="subtitle has-text-black">Acciones</h2>
         <input type="hidden" name="nHorariosDataHidden" value="{{nHorariosData}}"/>  <!-- Campo oculto duplicado para el número de horarios -->
-        <button style= "background-color:red; color:white" class="button is-block is-warning is-fullwidth" name="Apply">Aplicar cambios</button>  <!-- Botón para aplicar los cambios -->
+        <button style= "background-color:#b300ff; color:white" class="button is-block is-warning is-fullwidth" name="Apply"><b> Aplicar cambios</b> </button>  <!-- Botón para aplicar los cambios -->
     </div>
 </form>
 {% endblock %}
