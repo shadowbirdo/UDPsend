@@ -7,7 +7,6 @@ sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 UDP_IP = '192.168.4.1'
 UDP_PORT = 12345
 
-
 def main():
     """
     Función principal.
@@ -68,6 +67,12 @@ def gen_cal(st_year, st_month, fest):
                 _day = day_list[_date.weekday()]
                 _date_str = _date.strftime('%Y-%m-%d')
 
+                for j in fest:
+                    if j['st'] is '' and j['ed'] is not '':
+                        j['st'] = j['ed']
+                    elif j['ed'] is '' and j['st'] is not '':
+                        j['ed'] = j['st']
+
                 if any(datetime.strptime(j['st'], '%Y-%m-%d').date() <= _date.date() <= datetime.strptime(j['ed'], '%Y-%m-%d').date() for j in fest):
                     _udpCalM += 'F'
                 else:
@@ -121,9 +126,13 @@ def gen_rep(timetable):
     _rep = []
     for i in sort_time(timetable):
         if 'm' in str(i['rep']):
-            _rep.append(str(int(float(i["rep"].replace('m', ''))*60)).zfill(3))
+            if float(i["rep"].replace('m', ''))*60 > 999:
+                _rep.append('999')
+            else:
+                _rep.append(str(int(float(i["rep"].replace('m', ''))*60)).zfill(3))
         else:
             _rep.append(i["rep"].replace('s', '').zfill(3))
+
     return 'T' + '-'.join(_rep).ljust(83, "-")
 
 

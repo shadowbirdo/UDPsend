@@ -82,7 +82,7 @@
                     <td><input type="text" name="rep{{i}}" value="{{horariosData[i]['rep']}}" title="segundos"/></td>  <!-- Campo de entrada para la duración del horario -->
                     <td>
                         <input type="range" name="vol{{i}}" value="{{horariosData[i]['vol']}}" min="5" max="30" oninput="updateVolume(this, {{i}})"/>
-                        <span id="volPercent{{i}}">{{horariosData[i]['vol']}}%</span>
+                        <span id="volPercent{{i}}" style="color:white">{{horariosData[i]['vol']}}/30</span>
                     </td>  <!-- Campo de entrada para el volumen del horario -->
                 </tr>
                 {% endfor %}
@@ -97,7 +97,7 @@
 <script>
 function updateVolume(slider, index) {
     var volumePercent = document.getElementById('volPercent' + index);
-    volumePercent.textContent = Math.round((((slider.value - 5) / 25) * 100)) + '%';
+    volumePercent.textContent = slider.value + '/30';
 }
 </script>
 

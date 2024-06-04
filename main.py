@@ -7,6 +7,7 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'PARALELEPIPEDO'
 sendTime = 0
 
+
 # Test values, should be stored in a file with the appropriate retrieve method.
 class FileSystem:
     def __init__(self):
@@ -88,20 +89,25 @@ def editData():
                 festData[i]["ed"] = request.form.get("festFin" + str(i))
         elif request.form.get("PopFestivoRow") is not None:
             festData.pop()
+            festData[i]["st"] = request.form.get("festIni" + str(i))
+            festData[i]["ed"] = request.form.get("festFin" + str(i))
         elif request.form.get("AddHorarioRow") is not None:
-            horariosData.append({"time": "", "rep": "", "vol": ""})
-            print(request.form)
-            for i in range(len(horariosData)):
-                horariosData[i]["time"] = request.form.get("time" + str(i))
-                horariosData[i]["rep"] = request.form.get("rep" + str(i)) if request.form.get("rep" + str(i)) is not None else ""
-                horariosData[i]["vol"] = request.form.get("vol" + str(i)) if request.form.get("vol" + str(i)) is not None else "0"
+            print(len(horariosData))
+            if len(horariosData) < 21:
+                horariosData.append({"time": "", "rep": "", "vol": ""})
+                for i in range(len(horariosData)):
+                    horariosData[i]["time"] = request.form.get("time" + str(i))
+                    horariosData[i]["rep"] = request.form.get("rep" + str(i)) if request.form.get("rep" + str(i)) is not None else ""
+                    horariosData[i]["vol"] = request.form.get("vol" + str(i)) if request.form.get("vol" + str(i)) is not None else "0"
+            else:
+                flash('Número de tramos horarios máximo alcanzado.', 'warning')
         elif request.form.get("PopHorarioRow") is not None:
             horariosData.pop()
         elif request.form.get("Apply") is not None:
             if 0 < int(request.form.get("folder")) < 100:
                 folder = int(request.form.get("folder"))
             else:
-                flash('Número de carpeta no válido. Elija un valor entre 1 y 99.', 'danger')
+                flash('El número de carpeta introducido no es válido. Se ha autocompletado con el número más alto.', 'warning')
                 folder = 99
             year = int(request.form.get("year"))
             month = int(request.form.get("month")) + 1
@@ -118,6 +124,9 @@ def editData():
                     festData[i]["ed"] = request.form.get("festFin" + str(i))
                 else:
                     festData.pop()
+
+            # Validation
+
 
             # Flash Messages
             if True:
@@ -149,6 +158,8 @@ def editData():
                 logic.udp_send(cal)
                 print(f"UDP enviado: {cal}")
                 time.sleep(sendTime)
+
+            print(len(horariosData))
 
             # Save to file
             File.horariosDataFile = horariosData
