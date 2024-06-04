@@ -14,4 +14,4 @@ timetable2 = [
 
 
 def test_time_rows():
-    assert gen_time(timetable1) == gen_time(timetable2) == ("H0930-1030-1130", "N03")
+    assert gen_time(timetable1) == gen_time(timetable2) == ("H0930-1030-1130------------------------------------------------------------------------------------------", "N03")

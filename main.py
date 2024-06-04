@@ -1,10 +1,11 @@
 import logic
 import json
+import time
 from flask import Flask, render_template, request, redirect, url_for, flash
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'PARALELEPIPEDO'
-
+sendTime = 0
 
 # Test values, should be stored in a file with the appropriate retrieve method.
 class FileSystem:
@@ -83,25 +84,27 @@ def editData():
         if request.form.get("AddFestivoRow") is not None:
             festData.append({"st": "", "ed": ""})
             for i in range(0, len(festData)):
-                if not request.form.get("festIni" + str(i)) == request.form.get("festFin" + str(i)) == "":
-                    festData[i]["st"] = request.form.get("festIni" + str(i))
-                    festData[i]["ed"] = request.form.get("festFin" + str(i))
+                festData[i]["st"] = request.form.get("festIni" + str(i))
+                festData[i]["ed"] = request.form.get("festFin" + str(i))
         elif request.form.get("PopFestivoRow") is not None:
             festData.pop()
         elif request.form.get("AddHorarioRow") is not None:
             horariosData.append({"time": "", "rep": "", "vol": ""})
             print(request.form)
             for i in range(len(horariosData)):
-                if not request.form.get("time" + str(i)) == request.form.get("rep" + str(i)) == "":
-                    horariosData[i]["time"] = request.form.get("time" + str(i))
-                    horariosData[i]["rep"] = request.form.get("rep" + str(i)) if request.form.get("rep" + str(i)) is not None else ""
-                    horariosData[i]["vol"] = request.form.get("vol" + str(i))
+                horariosData[i]["time"] = request.form.get("time" + str(i))
+                horariosData[i]["rep"] = request.form.get("rep" + str(i)) if request.form.get("rep" + str(i)) is not None else ""
+                horariosData[i]["vol"] = request.form.get("vol" + str(i)) if request.form.get("vol" + str(i)) is not None else "0"
         elif request.form.get("PopHorarioRow") is not None:
             horariosData.pop()
         elif request.form.get("Apply") is not None:
-            folder = int(request.form.get("folder"))
+            if 0 < int(request.form.get("folder")) < 100:
+                folder = int(request.form.get("folder"))
+            else:
+                flash('Número de carpeta no válido. Elija un valor entre 1 y 99.', 'danger')
+                folder = 99
             year = int(request.form.get("year"))
-            month = int(request.form.get("month"))
+            month = int(request.form.get("month")) + 1
             for i in range(len(horariosData)):
                 if not request.form.get("time" + str(i)) == request.form.get("rep" + str(i)) == "":
                     horariosData[i]["time"] = request.form.get("time" + str(i))
@@ -110,40 +113,48 @@ def editData():
                 elif request.form.get("time" + str(i)) == request.form.get("rep" + str(i)) == "":
                     horariosData.pop()
             for i in range(0, len(festData)):
-                if not request.form.get("festIni" + str(i)) == request.form.get("festFin" + str(i)) == "":
+                if request.form.get("festIni" + str(i)) and request.form.get("festFin" + str(i)) is not None:
                     festData[i]["st"] = request.form.get("festIni" + str(i))
                     festData[i]["ed"] = request.form.get("festFin" + str(i))
+                else:
+                    festData.pop()
 
             # Flash Messages
-            if 0 <= folder <= 100:
-                flash('Operation completed successfully!', 'success')
-            else:
-                flash('Error', 'danger')
+            if True:
+                flash('Mensajes UDP enviados.', 'success')
 
             # Send Commands
             logic.udp_send(logic.gen_now())
             print(f"UDP enviado: {logic.gen_now()}")
+            time.sleep(sendTime)
 
             logic.udp_send(logic.gen_fol(folder))
             print(f"UDP enviado: {logic.gen_fol(folder)}")
+            time.sleep(sendTime)
 
-            [logic.udp_send(tim) for tim in logic.gen_time(horariosData)]
-            [print(f"UDP enviado: {tim}") for tim in logic.gen_time(horariosData)]
+            for tim in logic.gen_time(horariosData):
+                logic.udp_send(tim)
+                print(f"UDP enviado: {tim}")
+                time.sleep(sendTime)
 
             logic.udp_send(logic.gen_rep(horariosData))
             print(f"UDP enviado: {logic.gen_rep(horariosData)}")
+            time.sleep(sendTime)
 
             logic.udp_send(logic.gen_vol(horariosData))
             print(f"UDP enviado: {logic.gen_vol(horariosData)}")
+            time.sleep(sendTime)
 
-            [logic.udp_send(cal) for cal in logic.gen_cal(year, month, festData)]
-            [print(f"UDP enviado: {cal}") for cal in logic.gen_cal(year, month, festData)]
+            for cal in logic.gen_cal(year, month, festData):
+                logic.udp_send(cal)
+                print(f"UDP enviado: {cal}")
+                time.sleep(sendTime)
 
             # Save to file
             File.horariosDataFile = horariosData
             File.festDataFile = festData
             File.yearFile = year
-            File.monthFile = month + 1
+            File.monthFile = month
             File.folderFile = folder
 
             # Save data to JSON

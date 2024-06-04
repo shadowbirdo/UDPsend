@@ -14,8 +14,8 @@ timetable2 = [
 
 
 def test_rep_in_order():
-    assert gen_rep(timetable1) == "T030-045-060"
+    assert gen_rep(timetable1) == "T030-045-060------------------------------------------------------------------------"
 
 
 def test_rep_not_order():
-    assert gen_rep(timetable2) == "T060-030-045"
+    assert gen_rep(timetable2) == "T060-030-045------------------------------------------------------------------------"

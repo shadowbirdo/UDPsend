@@ -1,4 +1,5 @@
 import socket
+import time
 from datetime import datetime
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -103,7 +104,7 @@ def gen_time(timetable):
         Tuple[str, str]: Tupla de 2 cadenas de caracteres: el horario[0] y el nº de tramos[1].
     """
     _time = [i["time"].replace(':', '').zfill(2) for i in sort_time(timetable)]
-    _udpTime = 'H' + '-'.join(_time)
+    _udpTime = 'H' + '-'.join(_time).ljust(104, "-")
     return _udpTime, f'N{str(len(_time)).zfill(2)}'
 
 
@@ -117,10 +118,13 @@ def gen_rep(timetable):
     Returns:
         str: Cadena de caracteres con el tiempo de reproducción de cada tramo horario.
     """
-
-    _rep = [i["rep"].replace('s', '').zfill(3) for i in sort_time(timetable)]
-    _udpRep = 'T' + '-'.join(_rep)
-    return _udpRep
+    _rep = []
+    for i in sort_time(timetable):
+        if 'm' in str(i['rep']):
+            _rep.append(str(int(float(i["rep"].replace('m', ''))*60)).zfill(3))
+        else:
+            _rep.append(i["rep"].replace('s', '').zfill(3))
+    return 'T' + '-'.join(_rep).ljust(83, "-")
 
 
 def gen_vol(timetable):
@@ -134,8 +138,7 @@ def gen_vol(timetable):
         str: Cadenas de caracteres con el tiempo de reproducción de cada tramo horario.
     """
     _vol = [i["vol"].zfill(2) for i in sort_time(timetable)]
-    _udpVol = 'V' + '-'.join(_vol)
-    return _udpVol
+    return 'V' + '-'.join(_vol).ljust(62, "-")
 
 
 def gen_fol(folder):
@@ -148,8 +151,12 @@ def gen_fol(folder):
     Returns:
         str: Nombre de la carpeta formateado con una "F" al inicio y con un cero a la izquierda si es necesario.
     """
-    return f'F{str(folder).zfill(2)}'
-
+    if 0 < int(folder) < 100:
+        return f'F{str(folder).zfill(2)}'
+    elif folder < 0:
+        return 'F01'
+    elif folder > 100:
+        return 'F99'
 
 def gen_now():
     """

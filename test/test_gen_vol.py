@@ -14,9 +14,9 @@ timetable2 = [
 
 
 def test_vol_in_order():
-    assert gen_vol(timetable1) == "V15-10-05"
+    assert gen_vol(timetable1) == "V15-10-05------------------------------------------------------"
 
 
 def test_vol_not_order():
-    assert gen_vol(timetable2) == "V05-15-10"
+    assert gen_vol(timetable2) == "V05-15-10------------------------------------------------------"
 
