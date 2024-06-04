@@ -61,7 +61,7 @@ td:not([align]),th:not([align]) {
 }
 
 :root {
-    --bulma-body-background-color: hsl(0deg 64.43% 29.01%);
+    --bulma-body-background-color: hsla(0, 0%, 100%, 0);
     --bulma-body-size: 1em;
     --bulma-body-min-width: 300px;
     --bulma-body-rendering: optimizeLegibility;
