@@ -174,7 +174,7 @@ def gen_now():
     Returns:
         str: Cadena con el formato 'D-YYYY/MM/DD/HH/MM/SS' representando la fecha y hora actual.
     """
-    return f'D-{datetime.now().strftime('%Y/%m/%d/%H/%M/%S')}'
+    return f"D-{datetime.now().strftime('%Y/%m/%d/%H/%M/%S')}"
 
 
 if __name__ == '__main__':

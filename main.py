@@ -1,11 +1,23 @@
+import os
+
 import logic
 import json
 import time
+import flask
 from flask import Flask, render_template, request, redirect, url_for, flash
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'PARALELEPIPEDO'
 sendTime = 0
+
+
+class ActionEnum:
+    RemoveFestivo = 0
+    AddFestivo = 1
+    RemoveHorario = 2
+    AddHorario = 3
+    Apply = 4
+    Nothing = 5
 
 
 # Test values, should be stored in a file with the appropriate retrieve method.
@@ -65,73 +77,141 @@ class FileSystem:
 File = FileSystem()
 
 
+def GetData(mRequest):
+    year = int(mRequest.form.get("year"))
+    month = int(mRequest.form.get("month")) + 1
+    folder = int(mRequest.form.get("folder"))
+
+    festInis = mRequest.form.getlist("festIni")
+    festFins = mRequest.form.getlist("festFin")
+    festData = []
+    for i in range(len(festInis)):
+        festData.append({"st": festInis[i], "ed": festFins[i]})
+
+    times = mRequest.form.getlist("time")
+    reps = mRequest.form.getlist("rep")
+    vols = mRequest.form.getlist("vol")
+    horariosData = []
+    for i in range(len(times)):
+        horariosData.append({"time": times[i], "rep": reps[i], "vol": vols[i]})
+
+    if mRequest.form.get("AddFestivoRow") is not None:
+        action = ActionEnum.AddFestivo
+    elif mRequest.form.get("PopFestivoRow") is not None:
+        action = ActionEnum.RemoveFestivo
+    elif mRequest.form.get("AddHorarioRow") is not None:
+        action = ActionEnum.AddHorario
+    elif mRequest.form.get("PopHorarioRow") is not None:
+        action = ActionEnum.RemoveHorario
+    elif mRequest.form.get("Apply") is not None:
+        action = ActionEnum.Apply
+    else:
+        action = ActionEnum.Nothing
+
+    return action, horariosData, festData, year, month, folder
+
+
+def ValidateData(horariosData, festData, year, month, folder, isSending):
+    errorMessages = []
+    notificationMessages = []
+
+    # Ensure valid folder
+    if not 0 < folder < 100:
+        errorMessages.append("La carpeta debe estar en 0 y 100. Se ha asignado automáticamente el valor más alto.")
+        folder = 99
+
+    # Fix Horarios None fields
+    for i in range(len(horariosData)):
+        if horariosData[i]["time"] != '':
+            horariosData[i]["rep"] = horariosData[i]["rep"] if horariosData[i]["rep"] is not None else ""
+            horariosData[i]["vol"] = horariosData[i]["vol"] if horariosData[i]["vol"] is not None else "5"
+
+    # Fix Festivos empty fields
+    for festPair in festData:
+        if festPair['st'] == '' and festPair['ed'] != '':
+            festPair['st'] = festPair['ed']
+            notificationMessages.append("Te puse el inicio como el final weon")
+        elif festPair['ed'] == '' and festPair['st'] != '':
+            festPair['ed'] = festPair['st']
+            notificationMessages.append("Te puse el final como el inicio bobo")
+
+    # Only execute this validation when we are about to send UDP
+    if isSending:
+        # Delete empty Horarios
+        nHorRem = 0
+        tmpHorariosData = []
+        for i in range(len(horariosData)):
+            if horariosData[i]["time"] != '':
+                tmpHorariosData.append(
+                    {"time": horariosData[i]["time"], "rep": horariosData[i]["rep"], "vol": horariosData[i]["vol"]})
+            else:
+                nHorRem += 1
+        horariosData = tmpHorariosData
+
+        if nHorRem > 0:
+            errorMessages.append(
+                f'Se ha{"n" if nHorRem > 1 else ""} eliminado {nHorRem} {"filas" if nHorRem > 1 else " fila"} de tramos horarios vacía{"s" if nHorRem > 1 else ""}.')
+
+        # Delete empty Festivos
+        nFestRem = 0
+        tmpFestData = []
+        for i in range(0, len(festData)):
+            if festData[i]["st"] != "" and festData[i]["ed"] != "":
+                tmpFestData.append({"st": festData[i]["st"], "ed": festData[i]["ed"]})
+            else:
+                nFestRem += 1
+        festData = tmpFestData
+
+        if nFestRem > 0:
+            errorMessages.append(
+                f'Se ha{"n" if nFestRem > 1 else ""} eliminado {nFestRem} {"filas" if nFestRem > 1 else " fila"} de festivos vacía{"s" if nFestRem > 1 else ""}.')
+
+    return errorMessages, notificationMessages, horariosData, festData, year, month, folder
+
+
 @app.route("/", methods=['GET', 'POST'])
 def editData():
     print("EditData Route")
 
-    # Grab file version
-    horariosData = File.horariosDataFile
-    festData = File.festDataFile
-    year = File.yearFile
-    month = File.monthFile - 1
-    folder = File.folderFile
-
     if request.method == 'GET':
         print("GET METHOD CALLED!")
+        # Grab file version
+        horariosData = File.horariosDataFile
+        festData = File.festDataFile
+        year = File.yearFile
+        month = File.monthFile - 1
+        folder = File.folderFile
         return render_template('editData.html', festData=festData, nFestivosData=len(festData),
-                                       horariosData=horariosData, nHorariosData=len(horariosData), year=year,
-                                       month=month, folder=folder)
+                               horariosData=horariosData, nHorariosData=len(horariosData), year=year,
+                               month=month, folder=folder)
     elif request.method == 'POST':
-        if request.form.get("AddFestivoRow") is not None:
+        action, horariosData, festData, year, month, folder = GetData(request)
+
+        isSendingUDP = action == ActionEnum.Apply
+        errorMessages, notificationMessages, horariosData, festData, year, month, folder = ValidateData(horariosData,
+                                                                                                        festData, year,
+                                                                                                        month,
+                                                                                                        folder,
+                                                                                                        isSendingUDP)
+
+        if action == ActionEnum.AddFestivo:
             festData.append({"st": "", "ed": ""})
-            for i in range(0, len(festData)):
-                festData[i]["st"] = request.form.get("festIni" + str(i))
-                festData[i]["ed"] = request.form.get("festFin" + str(i))
-        elif request.form.get("PopFestivoRow") is not None:
-            festData.pop()
-            festData[i]["st"] = request.form.get("festIni" + str(i))
-            festData[i]["ed"] = request.form.get("festFin" + str(i))
-        elif request.form.get("AddHorarioRow") is not None:
-            print(len(horariosData))
-            if len(horariosData) < 21:
-                horariosData.append({"time": "", "rep": "", "vol": ""})
-                for i in range(len(horariosData)):
-                    horariosData[i]["time"] = request.form.get("time" + str(i))
-                    horariosData[i]["rep"] = request.form.get("rep" + str(i)) if request.form.get("rep" + str(i)) is not None else ""
-                    horariosData[i]["vol"] = request.form.get("vol" + str(i)) if request.form.get("vol" + str(i)) is not None else "0"
+        elif action == ActionEnum.RemoveFestivo:
+            if len(festData) < 1:
+                errorMessages.append("La lista de festivos ya esta vacía")
             else:
-                flash('Número de tramos horarios máximo alcanzado.', 'warning')
-        elif request.form.get("PopHorarioRow") is not None:
-            horariosData.pop()
-        elif request.form.get("Apply") is not None:
-            if 0 < int(request.form.get("folder")) < 100:
-                folder = int(request.form.get("folder"))
+                festData.pop()
+        elif action == ActionEnum.AddHorario:
+            if len(horariosData) < 20:
+                horariosData.append({"time": "", "rep": "", "vol": "5"})
             else:
-                flash('El número de carpeta introducido no es válido. Se ha autocompletado con el número más alto.', 'warning')
-                folder = 99
-            year = int(request.form.get("year"))
-            month = int(request.form.get("month")) + 1
-            for i in range(len(horariosData)):
-                if not request.form.get("time" + str(i)) == request.form.get("rep" + str(i)) == "":
-                    horariosData[i]["time"] = request.form.get("time" + str(i))
-                    horariosData[i]["rep"] = request.form.get("rep" + str(i))
-                    horariosData[i]["vol"] = request.form.get("vol" + str(i))
-                elif request.form.get("time" + str(i)) == request.form.get("rep" + str(i)) == "":
-                    horariosData.pop()
-            for i in range(0, len(festData)):
-                if request.form.get("festIni" + str(i)) and request.form.get("festFin" + str(i)) is not None:
-                    festData[i]["st"] = request.form.get("festIni" + str(i))
-                    festData[i]["ed"] = request.form.get("festFin" + str(i))
-                else:
-                    festData.pop()
-
-            # Validation
-
-
-            # Flash Messages
-            if True:
-                flash('Mensajes UDP enviados.', 'success')
-
+                errorMessages.append('Número de tramos horarios máximo alcanzado.')
+        elif action == ActionEnum.RemoveHorario:
+            if len(horariosData) < 1:
+                errorMessages.append("La lista de tramos horarios ya esta vacía")
+            else:
+                horariosData.pop()
+        elif action == ActionEnum.Apply:
             # Send Commands
             logic.udp_send(logic.gen_now())
             print(f"UDP enviado: {logic.gen_now()}")
@@ -161,17 +241,51 @@ def editData():
 
             print(len(horariosData))
 
-            # Save to file
-            File.horariosDataFile = horariosData
-            File.festDataFile = festData
-            File.yearFile = year
-            File.monthFile = month
-            File.folderFile = folder
+        # Update data
+        File.horariosDataFile = horariosData
+        File.festDataFile = festData
+        File.yearFile = year
+        File.monthFile = month
+        File.folderFile = folder
 
-            # Save data to JSON
-            File.save_data()
+        # Save data to JSON (disk)
+        File.save_data()
+
+        # Flash messages
+        for notificationMessage in notificationMessages:
+            flash(notificationMessage, 'info')
+
+        if len(errorMessages) != 0:
+            for errorMessage in errorMessages:
+                flash(errorMessage, 'warning')
+        elif request.form.get('Apply') is not None:
+            flash('Mensajes UDP enviados.', 'success')
 
         return redirect(url_for('editData'))
+
+
+@app.route('/favicon.ico')
+def favicon():
+    basePath, unused = os.path.split(app.root_path)
+    return flask.send_from_directory(os.path.join(basePath, 'favicon_io'), 'favicon.ico')
+
+
+@app.route('/apple-touch-icon.ico')
+def apple_icon():
+    basePath, unused = os.path.split(app.root_path)
+    return flask.send_from_directory(os.path.join(basePath, 'static', 'favicon_io'), 'apple-touch-icon.png')
+
+
+@app.route('/icon')
+def icon():
+    basePath, unused = os.path.split(app.root_path)
+    return flask.send_from_directory(os.path.join(basePath, 'static', 'favicon_io'), 'favicon-32x32.png')
+
+
+@app.route('/manifest')
+def manifest():
+    basePath, unused = os.path.split(app.root_path)
+    return redirect(os.path.join(basePath, 'favicon_io', 'static', 'site.webmanifest'))
 
 
 app.run(debug=True, port=5000)

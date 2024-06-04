@@ -48,8 +48,8 @@
                         </thead>
                         {% for i in range(0, nFestivosData) %}  <!-- Bucle para iterar sobre los datos de festivos -->
                             <tr>
-                                <td><input type="date" name="festIni{{i}}" value="{{festData[i]['st']}}" min="2023-1-1" max="2100-12-31"></td>  <!-- Campo de entrada para la fecha de inicio del festivo -->
-                                <td><input type="date" name="festFin{{i}}" value="{{festData[i]['ed']}}" min="2023-1-1" max="2100-12-31"></td>  <!-- Campo de entrada para la fecha de fin del festivo -->
+                                <td><input type="date" name="festIni" value="{{festData[i]['st']}}" min="2023-1-1" max="2100-12-31"></td>  <!-- Campo de entrada para la fecha de inicio del festivo -->
+                                <td><input type="date" name="festFin" value="{{festData[i]['ed']}}" min="2023-1-1" max="2100-12-31"></td>  <!-- Campo de entrada para la fecha de fin del festivo -->
                             </tr>
                         {% endfor %}
                     </table>
@@ -78,10 +78,10 @@
             <tbody>
                 {% for i in range(0, nHorariosData) %}  <!-- Bucle para iterar sobre los datos de horarios -->
                 <tr>
-                    <td><input type="time" name="time{{i}}" value="{{horariosData[i]['time']}}"/></td>  <!-- Campo de entrada para la hora del horario -->
-                    <td><input type="text" name="rep{{i}}" value="{{horariosData[i]['rep']}}" title="segundos"/></td>  <!-- Campo de entrada para la duración del horario -->
+                    <td><input type="time" name="time" value="{{horariosData[i]['time']}}"/></td>  <!-- Campo de entrada para la hora del horario -->
+                    <td><input type="text" name="rep" value="{{horariosData[i]['rep']}}" title="segundos"/></td>  <!-- Campo de entrada para la duración del horario -->
                     <td>
-                        <input type="range" name="vol{{i}}" value="{{horariosData[i]['vol']}}" min="5" max="30" oninput="updateVolume(this, {{i}})"/>
+                        <input type="range" name="vol" value="{{horariosData[i]['vol']}}" min="5" max="30" oninput="updateVolume(this, {{i}})"/>
                         <span id="volPercent{{i}}" style="color:white">{{horariosData[i]['vol']}}/30</span>
                     </td>  <!-- Campo de entrada para el volumen del horario -->
                 </tr>
@@ -106,7 +106,7 @@ function updateVolume(slider, index) {
     <div class="box">
         <h2 class="subtitle has-text-black">Acciones</h2>
         <input type="hidden" name="nHorariosDataHidden" value="{{nHorariosData}}"/>  <!-- Campo oculto duplicado para el número de horarios -->
-        <button style= "background-color:#b300ff; color:white" class="button is-block is-warning is-fullwidth" name="Apply"><b> Aplicar cambios</b> </button>  <!-- Botón para aplicar los cambios -->
+        <button style= "background-color:#b300ff; color:white" class="button is-block is-warning is-fullwidth" name="Apply"><b> Aplicar cambios y enviar UDP</b> </button>  <!-- Botón para aplicar los cambios -->
     </div>
 </form>
 {% endblock %}
