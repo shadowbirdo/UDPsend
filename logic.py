@@ -7,19 +7,20 @@ sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 UDP_IP = '192.168.4.1'
 UDP_PORT = 12345
 
+
 def main():
     """
     Función principal.
     """
     horarios_data_file = [
-        {"time": "09:30", "rep": "45s", "vol": "5"},
-        {"time": "10:30", "rep": "45s", "vol": "10"},
-        {"time": "11:30", "rep": "60s", "vol": "5"}
+        {'time': '09:30', 'rep': '45s', 'vol': '5'},
+        {'time': '10:30', 'rep': '45s', 'vol': '10'},
+        {'time': '11:30', 'rep': '60s', 'vol': '5'}
     ]
     fest_data_file = [
-        {"st": "2024-05-11", "ed": "2024-05-13"},
-        {"st": "2024-06-03", "ed": "2024-06-18"},
-        {"st": "2024-11-10", "ed": "2024-11-10"}
+        {'st': '2024-05-11', 'ed': '2024-05-13'},
+        {'st': '2024-06-03', 'ed': '2024-06-18'},
+        {'st': '2024-11-10', 'ed': '2024-11-10'}
     ]
     print(gen_time(horarios_data_file))
     year = int(input('Año: '))
@@ -95,7 +96,7 @@ def sort_time(timetable):
     Returns:
         list of dict: Lista de diccionarios ordenada por la clave 'time'.
     """
-    return sorted(timetable, key=lambda x: x["time"])
+    return sorted(timetable, key=lambda x: x['time'])
 
 
 def gen_time(timetable):
@@ -108,8 +109,8 @@ def gen_time(timetable):
     Returns:
         Tuple[str, str]: Tupla de 2 cadenas de caracteres: el horario[0] y el nº de tramos[1].
     """
-    _time = [i["time"].replace(':', '').zfill(2) for i in sort_time(timetable)]
-    _udpTime = 'H' + '-'.join(_time).ljust(104, "-")
+    _time = [i['time'].replace(':', '').zfill(2) for i in sort_time(timetable)]
+    _udpTime = 'H' + '-'.join(_time).ljust(104, '-')
     return _udpTime, f'N{str(len(_time)).zfill(2)}'
 
 
@@ -126,12 +127,12 @@ def gen_rep(timetable):
     _rep = []
     for i in sort_time(timetable):
         if 'm' in str(i['rep']):
-            if float(i["rep"].replace('m', ''))*60 > 999:
+            if float(i['rep'].replace('m', ''))*60 > 999:
                 _rep.append('999')
             else:
-                _rep.append(str(int(float(i["rep"].replace('m', ''))*60)).zfill(3))
+                _rep.append(str(int(float(i['rep'].replace('m', ''))*60)).zfill(3))
         else:
-            _rep.append(i["rep"].replace('s', '').zfill(3))
+            _rep.append(i['rep'].replace('s', '').zfill(3))
 
     return 'T' + '-'.join(_rep).ljust(83, "-")
 
@@ -146,8 +147,8 @@ def gen_vol(timetable):
     Returns:
         str: Cadenas de caracteres con el tiempo de reproducción de cada tramo horario.
     """
-    _vol = [i["vol"].zfill(2) for i in sort_time(timetable)]
-    return 'V' + '-'.join(_vol).ljust(62, "-")
+    _vol = [i['vol'].zfill(2) for i in sort_time(timetable)]
+    return 'V' + '-'.join(_vol).ljust(62, '-')
 
 
 def gen_fol(folder):
@@ -167,6 +168,7 @@ def gen_fol(folder):
     elif folder > 100:
         return 'F99'
 
+
 def gen_now():
     """
     Genera una cadena con la fecha y hora actual en el formato adecuado.
@@ -174,7 +176,7 @@ def gen_now():
     Returns:
         str: Cadena con el formato 'D-YYYY/MM/DD/HH/MM/SS' representando la fecha y hora actual.
     """
-    return f"D-{datetime.now().strftime('%Y/%m/%d/%H/%M/%S')}"
+    return f'D-{datetime.now().strftime('%Y/%m/%d/%H/%M/%S')}'
 
 
 if __name__ == '__main__':
