@@ -3,8 +3,7 @@ import os
 import logic
 import json
 import time
-import flask
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, send_from_directory
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'PARALELEPIPEDO'
@@ -273,26 +272,23 @@ def editData():
 
 @app.route('/favicon.ico')
 def favicon():
-    basePath, unused = os.path.split(app.root_path)
-    return flask.send_from_directory(os.path.join(basePath, 'favicon_io'), 'favicon.ico')
+    return send_from_directory(os.path.join(app.root_path, 'favicon_io'), 'favicon.ico')
 
 
 @app.route('/apple-touch-icon.ico')
 def apple_icon():
-    basePath, unused = os.path.split(app.root_path)
-    return flask.send_from_directory(os.path.join(basePath, 'static', 'favicon_io'), 'apple-touch-icon.png')
+    return send_from_directory(os.path.join(app.root_path, 'static', 'favicon_io'), 'apple-touch-icon.png')
 
 
 @app.route('/icon')
 def icon():
-    basePath, unused = os.path.split(app.root_path)
-    return flask.send_from_directory(os.path.join(basePath, 'static', 'favicon_io'), 'favicon-32x32.png')
+    return send_from_directory(os.path.join(app.root_path, 'static', 'favicon_io'), 'favicon-32x32.png')
 
 
 @app.route('/manifest')
 def manifest():
-    basePath, unused = os.path.split(app.root_path)
-    return redirect(os.path.join(basePath, 'favicon_io', 'static', 'site.webmanifest'))
+    return send_from_directory(os.path.join(app.root_path, 'static', 'favicon_io'), 'site.webmanifest')
 
 
-app.run(debug=True, port=5000)
+if __name__ == '__main__':
+    app.run(debug=True, port=5000)
