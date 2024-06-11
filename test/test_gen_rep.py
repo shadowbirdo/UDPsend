@@ -1,15 +1,15 @@
 from logic import gen_rep
 
 timetable1 = [
-        {'time': '09:30', 'rep': '30s', 'vol': '15'},
-        {'time': '10:30', 'rep': '45s', 'vol': '10'},
-        {'time': '11:30', 'rep': '60s', 'vol': '5'}
+        {'time': '09:30', 'rep': '30', 'vol': '15'},
+        {'time': '10:30', 'rep': '45', 'vol': '10'},
+        {'time': '11:30', 'rep': '60', 'vol': '5'}
     ]
 
 timetable2 = [
-        {'time': '10:30', 'rep': '30s', 'vol': '15'},
-        {'time': '11:30', 'rep': '45s', 'vol': '10'},
-        {'time': '09:30', 'rep': '60s', 'vol': '5'}
+        {'time': '10:30', 'rep': '30', 'vol': '15'},
+        {'time': '11:30', 'rep': '45', 'vol': '10'},
+        {'time': '09:30', 'rep': '60', 'vol': '5'}
     ]
 
 

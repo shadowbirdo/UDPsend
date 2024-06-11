@@ -1,5 +1,4 @@
 import socket
-import time
 from datetime import datetime
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -69,9 +68,9 @@ def gen_cal(st_year, st_month, fest):
                 _date_str = _date.strftime('%Y-%m-%d')
 
                 for j in fest:
-                    if j['st'] is '' and j['ed'] is not '':
+                    if j['st'] == '' and j['ed'] != '':
                         j['st'] = j['ed']
-                    elif j['ed'] is '' and j['st'] is not '':
+                    elif j['ed'] == '' and j['st'] != '':
                         j['ed'] = j['st']
 
                 if any(datetime.strptime(j['st'], '%Y-%m-%d').date() <= _date.date() <= datetime.strptime(j['ed'], '%Y-%m-%d').date() for j in fest):
@@ -124,16 +123,7 @@ def gen_rep(timetable):
     Returns:
         str: Cadena de caracteres con el tiempo de reproducción de cada tramo horario.
     """
-    _rep = []
-    for i in sort_time(timetable):
-        if 'm' in str(i['rep']):
-            if float(i['rep'].replace('m', ''))*60 > 999:
-                _rep.append('999')
-            else:
-                _rep.append(str(int(float(i['rep'].replace('m', ''))*60)).zfill(3))
-        else:
-            _rep.append(i['rep'].replace('s', '').zfill(3))
-
+    _rep = [i['rep'].zfill(3) for i in sort_time(timetable)]
     return 'T' + '-'.join(_rep).ljust(83, "-")
 
 

@@ -43,11 +43,13 @@
                 <div class="table-container">
                     <table class="table is-fullwidth is-striped">
                         <thead>
+                            <th>ID</th>
                             <th>Inicio</th>  <!-- Encabezado de la columna Inicio -->
                             <th>Fin</th>  <!-- Encabezado de la columna Fin -->
                         </thead>
                         {% for i in range(0, nFestivosData) %}  <!-- Bucle para iterar sobre los datos de festivos -->
                             <tr>
+                                <td style="color:white">{{i + 1}}</td>
                                 <td><input type="date" name="festIni" value="{{festData[i]['st']}}" min="2023-1-1" max="2100-12-31"></td>  <!-- Campo de entrada para la fecha de inicio del festivo -->
                                 <td><input type="date" name="festFin" value="{{festData[i]['ed']}}" min="2023-1-1" max="2100-12-31"></td>  <!-- Campo de entrada para la fecha de fin del festivo -->
                             </tr>
@@ -70,6 +72,7 @@
         <table class="table is-fullwidth is-striped">
             <thead>
                 <tr>
+                    <th>ID</th>
                     <th>Hora</th>  <!-- Encabezado de la columna Hora -->
                     <th>Duración</th>  <!-- Encabezado de la columna Duración -->
                     <th>Volumen</th>  <!-- Encabezado de la columna Volumen -->
@@ -78,6 +81,7 @@
             <tbody>
                 {% for i in range(0, nHorariosData) %}  <!-- Bucle para iterar sobre los datos de horarios -->
                 <tr>
+                    <td style="color:white">{{i + 1}}</td>
                     <td><input type="time" name="time" value="{{horariosData[i]['time']}}"/></td>  <!-- Campo de entrada para la hora del horario -->
                     <td><input type="text" name="rep" value="{{horariosData[i]['rep']}}" title="segundos"/></td>  <!-- Campo de entrada para la duración del horario -->
                     <td>

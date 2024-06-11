@@ -22,7 +22,7 @@ class ActionEnum:
 # Test values, should be stored in a file with the appropriate retrieve method.
 class FileSystem:
     def __init__(self):
-        self.data = self.load_data()
+        self.__dict__ = self.load_data()
 
     def load_data(self):
         with open('data.json', 'r') as file:
@@ -30,47 +30,7 @@ class FileSystem:
 
     def save_data(self):
         with open('data.json', 'w') as file:
-            json.dump(self.data, file, indent=4)
-
-    @property
-    def festDataFile(self):
-        return self.data['festDataFile']
-
-    @festDataFile.setter
-    def festDataFile(self, value):
-        self.data['festDataFile'] = value
-
-    @property
-    def horariosDataFile(self):
-        return self.data['horariosDataFile']
-
-    @horariosDataFile.setter
-    def horariosDataFile(self, value):
-        self.data['horariosDataFile'] = value
-
-    @property
-    def yearFile(self):
-        return self.data['yearFile']
-
-    @yearFile.setter
-    def yearFile(self, value):
-        self.data['yearFile'] = value
-
-    @property
-    def monthFile(self):
-        return self.data['monthFile']
-
-    @monthFile.setter
-    def monthFile(self, value):
-        self.data['monthFile'] = value
-
-    @property
-    def folderFile(self):
-        return self.data['folderFile']
-
-    @folderFile.setter
-    def folderFile(self, value):
-        self.data['folderFile'] = value
+            json.dump(self.__dict__, file, indent=4)
 
 
 File = FileSystem()
@@ -112,11 +72,12 @@ def GetData(mRequest):
 
 def ValidateData(horariosData, festData, year, month, folder, isSending):
     errorMessages = []
+    warningMessages = []
     notificationMessages = []
 
     # Ensure valid folder
     if not 0 < folder < 100:
-        errorMessages.append('La carpeta debe estar entre 1 y 99. Se ha asignado automáticamente el valor más alto.')
+        warningMessages.append('La carpeta debe estar entre 1 y 99. Se ha asignado automáticamente el valor más alto.')
         folder = 99
 
     # Fix Horarios None fields
@@ -124,19 +85,6 @@ def ValidateData(horariosData, festData, year, month, folder, isSending):
         if horariosData[i]['time'] != '':
             horariosData[i]['rep'] = horariosData[i]['rep'] if horariosData[i]['rep'] is not None else ''
             horariosData[i]['vol'] = horariosData[i]['vol'] if horariosData[i]['vol'] is not None else '5'
-
-    # Fix Festivos empty fields
-    nFestPair = 0
-    for festPair in festData:
-        nFestPair += 1
-        if festPair['st'] == '' and festPair['ed'] != '':
-            festPair['st'] = festPair['ed']
-            notificationMessages.append(f'El campo de inicio de la fila {nFestPair} en la sección de festivos estaba '
-                                        f'vacío. Se le ha asignado el valor del campo de finalización.')
-        elif festPair['ed'] == '' and festPair['st'] != '':
-            festPair['ed'] = festPair['st']
-            notificationMessages.append(f'El campo de finalización de la fila {nFestPair} en la sección de festivos '
-                                        f'estaba vacío. Se le ha asignado el valor del campo de inicio.')
 
     # Only execute this validation when we are about to send UDP
     if isSending:
@@ -152,7 +100,7 @@ def ValidateData(horariosData, festData, year, month, folder, isSending):
         horariosData = tmpHorariosData
 
         if nHorRem > 0:
-            errorMessages.append(
+            warningMessages.append(
                 f'Se ha{"n" if nHorRem > 1 else ""} eliminado {nHorRem} {"filas" if nHorRem > 1 else "fila"} de tramos '
                 f'horarios vacía{"s" if nHorRem > 1 else ""}.')
 
@@ -160,18 +108,33 @@ def ValidateData(horariosData, festData, year, month, folder, isSending):
         nFestRem = 0
         tmpFestData = []
         for i in range(0, len(festData)):
-            if festData[i]['st'] != '' and festData[i]['ed'] != '':
+            if festData[i]['st'] != '' or festData[i]['ed'] != '':
                 tmpFestData.append({'st': festData[i]['st'], 'ed': festData[i]['ed']})
             else:
                 nFestRem += 1
         festData = tmpFestData
 
         if nFestRem > 0:
-            errorMessages.append(
+            warningMessages.append(
                 f'Se ha{"n" if nFestRem > 1 else ""} eliminado {nFestRem} {"filas" if nFestRem > 1 else "fila"} de '
                 f'festivos vacía{"s" if nFestRem > 1 else ""}.')
 
-    return errorMessages, notificationMessages, horariosData, festData, year, month, folder
+        # Fix Festivos empty fields
+        nFestPair = 0
+        for festPair in festData:
+            nFestPair += 1
+            if festPair['st'] == '' and festPair['ed'] != '':
+                festPair['st'] = festPair['ed']
+                notificationMessages.append(
+                    f'El campo de inicio de la fila {nFestPair} en la sección de festivos estaba '
+                    f'vacío. Se le ha asignado el valor del campo de finalización.')
+            elif festPair['ed'] == '' and festPair['st'] != '':
+                festPair['ed'] = festPair['st']
+                notificationMessages.append(
+                    f'El campo de finalización de la fila {nFestPair} en la sección de festivos '
+                    f'estaba vacío. Se le ha asignado el valor del campo de inicio.')
+
+    return errorMessages, warningMessages, notificationMessages, horariosData, festData, year, month, folder
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -193,58 +156,77 @@ def editData():
         action, horariosData, festData, year, month, folder = GetData(request)
 
         isSendingUDP = action == ActionEnum.Apply
-        errorMessages, notificationMessages, horariosData, festData, year, month, folder = ValidateData(horariosData,
-                                                                                                        festData, year,
-                                                                                                        month,
-                                                                                                        folder,
-                                                                                                        isSendingUDP)
+        errorMessages, warningMessages, notificationMessages, horariosData, festData, year, month, folder = ValidateData(
+            horariosData,
+            festData, year,
+            month,
+            folder,
+            isSendingUDP)
 
         if action == ActionEnum.AddFestivo:
             festData.append({'st': '', 'ed': ''})
         elif action == ActionEnum.RemoveFestivo:
             if len(festData) < 1:
-                errorMessages.append('La lista de festivos ya esta vacía')
+                warningMessages.append('La lista de festivos ya esta vacía')
             else:
                 festData.pop()
         elif action == ActionEnum.AddHorario:
             if len(horariosData) < 20:
                 horariosData.append({'time': '', 'rep': '', 'vol': '5'})
             else:
-                errorMessages.append('Número de tramos horarios máximo alcanzado.')
+                warningMessages.append('Número de tramos horarios máximo alcanzado.')
         elif action == ActionEnum.RemoveHorario:
             if len(horariosData) < 1:
-                errorMessages.append('La lista de tramos horarios ya esta vacía')
+                warningMessages.append('La lista de tramos horarios ya esta vacía')
             else:
                 horariosData.pop()
         elif action == ActionEnum.Apply:
-            # Send Commands
-            logic.udp_send(logic.gen_now())
-            print(f'UDP enviado: {logic.gen_now()}')
-            time.sleep(sendTime)
+            decoded_horariosData = []
+            cont = 0
+            for i in horariosData:
+                cont += 1
+                try:
+                    if 'm' in str(i['rep']):
+                        if float(i['rep'].replace('m', '')) * 60 > 999:
+                            decoded_horariosData.append({'time': i['time'], 'rep': '999'})
+                        else:
+                            decoded_horariosData.append(
+                                {'time': i['time'], 'rep': str(int(float(i['rep'].replace('m', '')) * 60))})
+                    else:
+                        decoded_horariosData.append(
+                            {'time': i['time'], 'rep': str(int(i['rep'].replace('s', '')))})
+                except ValueError:
+                    errorMessages.append(
+                        f'Error en el campo "Duración" de la fila {cont} en la sección horarios. {i['rep']} no es una duración válida.')
 
-            logic.udp_send(logic.gen_fol(folder))
-            print(f'UDP enviado: {logic.gen_fol(folder)}')
-            time.sleep(sendTime)
-
-            for tim in logic.gen_time(horariosData):
-                logic.udp_send(tim)
-                print(f'UDP enviado: {tim}')
+            if len(errorMessages) == 0:
+                # Send Commands
+                logic.udp_send(logic.gen_now())
+                print(f'UDP enviado: {logic.gen_now()}')
                 time.sleep(sendTime)
 
-            logic.udp_send(logic.gen_rep(horariosData))
-            print(f'UDP enviado: {logic.gen_rep(horariosData)}')
-            time.sleep(sendTime)
-
-            logic.udp_send(logic.gen_vol(horariosData))
-            print(f'UDP enviado: {logic.gen_vol(horariosData)}')
-            time.sleep(sendTime)
-
-            for cal in logic.gen_cal(year, month, festData):
-                logic.udp_send(cal)
-                print(f'UDP enviado: {cal}')
+                logic.udp_send(logic.gen_fol(folder))
+                print(f'UDP enviado: {logic.gen_fol(folder)}')
                 time.sleep(sendTime)
 
-            print(len(horariosData))
+                for tim in logic.gen_time(horariosData):
+                    logic.udp_send(tim)
+                    print(f'UDP enviado: {tim}')
+                    time.sleep(sendTime)
+
+                _gen_rep = logic.gen_rep(decoded_horariosData)
+                logic.udp_send(_gen_rep)
+                print(f'UDP enviado: {_gen_rep}')
+                time.sleep(sendTime)
+
+                logic.udp_send(logic.gen_vol(horariosData))
+                print(f'UDP enviado: {logic.gen_vol(horariosData)}')
+                time.sleep(sendTime)
+
+                for cal in logic.gen_cal(year, month, festData):
+                    logic.udp_send(cal)
+                    print(f'UDP enviado: {cal}')
+                    time.sleep(sendTime)
 
         # Update data
         File.horariosDataFile = horariosData
@@ -260,11 +242,14 @@ def editData():
         for notificationMessage in notificationMessages:
             flash(notificationMessage, 'info')
 
+        for warningMessage in warningMessages:
+            flash(warningMessage, 'warning')
+
         if len(errorMessages) != 0:
             for errorMessage in errorMessages:
-                flash(errorMessage, 'warning')
-
-        if request.form.get('Apply') is not None:
+                flash(errorMessage, 'danger')
+            flash('Mensajes UDP no enviados. Es necesario corregir los campos erróneos antes de enviar los mensajes.', 'danger')
+        elif request.form.get('Apply') is not None:
             flash('Mensajes UDP enviados.', 'success')
 
         return redirect(url_for('editData'))
@@ -272,22 +257,22 @@ def editData():
 
 @app.route('/favicon.ico')
 def favicon():
-    return send_from_directory(os.path.join(app.root_path, 'favicon_io'), 'favicon.ico')
+    return send_from_directory(os.path.join(app.root_path, 'static'), 'favicon.ico')
 
 
 @app.route('/apple-touch-icon.ico')
 def apple_icon():
-    return send_from_directory(os.path.join(app.root_path, 'static', 'favicon_io'), 'apple-touch-icon.png')
+    return send_from_directory(os.path.join(app.root_path, 'static', 'static'), 'apple-touch-icon.png')
 
 
 @app.route('/icon')
 def icon():
-    return send_from_directory(os.path.join(app.root_path, 'static', 'favicon_io'), 'favicon-32x32.png')
+    return send_from_directory(os.path.join(app.root_path, 'static', 'static'), 'favicon-32x32.png')
 
 
 @app.route('/manifest')
 def manifest():
-    return send_from_directory(os.path.join(app.root_path, 'static', 'favicon_io'), 'site.webmanifest')
+    return send_from_directory(os.path.join(app.root_path, 'static', 'static'), 'site.webmanifest')
 
 
 if __name__ == '__main__':
