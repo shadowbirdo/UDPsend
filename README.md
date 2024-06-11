@@ -1,9 +1,17 @@
-Si es la primera vez que se usa el programa, se deberá ejecutar primero "PythonInstall.bat" y luego "UDPsend.bat". En el
-resto de los casos, se ejecutará directamente "USPsend.bat".
+Si es la primera vez que se usa el programa, se deberán ejecutar en este orden:
+1. Install_Python.bat
+2. Install_Flask.bat
+3. UDPsend.bat
+
+Esto instalará las dependencias necesarias antes de ejecutar el programa. En el resto de los casos, bastará con ejecutar
+directamente **"UDPsend.bat"**.
 
 Los mensajes UDP enviados se mandan también por la terminal para poder comprobarlos.
 
 Los datos del programa se almacenan en "data.json" entre sesión y sesión.
+
+"main.py" contiene la variable "sendTime_delay". Esta variable determina el tiempo que espera el programa entre cada
+mensaje UDP enviado.
 
 Los mensajes UDP se condifican siguiendo el siguiente conjunto de reglas:
 
