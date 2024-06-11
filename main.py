@@ -197,7 +197,7 @@ def editData():
                             {'time': i['time'], 'rep': str(int(i['rep'].replace('s', '')))})
                 except ValueError:
                     errorMessages.append(
-                        f'Error en el campo "Duración" de la fila {cont} en la sección horarios. {i['rep']} no es una duración válida.')
+                        f'Error en el campo "Duración" de la fila {cont} en la sección horarios. "{i['rep']}" no es una duración válida.')
 
             if len(errorMessages) == 0:
                 # Send Commands
