@@ -7,7 +7,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash, sen
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'PARALELEPIPEDO'
-sendTime = 0
+sendTime_delay = 0
 
 
 class ActionEnum:
@@ -211,30 +211,30 @@ def editData():
                 # Send Commands
                 logic.udp_send(logic.gen_now())
                 print(f'UDP enviado: {logic.gen_now()}')
-                time.sleep(sendTime)
+                time.sleep(sendTime_delay)
 
                 logic.udp_send(logic.gen_fol(folder))
                 print(f'UDP enviado: {logic.gen_fol(folder)}')
-                time.sleep(sendTime)
+                time.sleep(sendTime_delay)
 
                 for tim in logic.gen_time(horariosData):
                     logic.udp_send(tim)
                     print(f'UDP enviado: {tim}')
-                    time.sleep(sendTime)
+                    time.sleep(sendTime_delay)
 
                 _gen_rep = logic.gen_rep(decoded_horariosData)
                 logic.udp_send(_gen_rep)
                 print(f'UDP enviado: {_gen_rep}')
-                time.sleep(sendTime)
+                time.sleep(sendTime_delay)
 
                 logic.udp_send(logic.gen_vol(horariosData))
                 print(f'UDP enviado: {logic.gen_vol(horariosData)}')
-                time.sleep(sendTime)
+                time.sleep(sendTime_delay)
 
                 for cal in logic.gen_cal(year, month, festData):
                     logic.udp_send(cal)
                     print(f'UDP enviado: {cal}')
-                    time.sleep(sendTime)
+                    time.sleep(sendTime_delay)
 
         # Update data
         File.horariosDataFile = horariosData
