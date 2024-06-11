@@ -134,6 +134,13 @@ def ValidateData(horariosData, festData, year, month, folder, isSending):
                     f'El campo de finalización de la fila {nFestPair} en la sección de festivos '
                     f'estaba vacío. Se le ha asignado el valor del campo de inicio.')
 
+            if festPair['st'] > festPair['ed']:
+                _tempSt, _tempEd = festPair['st'], festPair['ed']
+                festPair['st'], festPair['ed'] = _tempEd, _tempSt
+                notificationMessages.append(
+                    f'La fecha introducida en el campo de inicio de la fila {nFestPair} en la sección de festivos era '
+                    f'posterior a la fecha de finalización. Se han invertido los valores en estos campos.')
+
     return errorMessages, warningMessages, notificationMessages, horariosData, festData, year, month, folder
 
 
@@ -197,7 +204,8 @@ def editData():
                             {'time': i['time'], 'rep': str(int(i['rep'].replace('s', '')))})
                 except ValueError:
                     errorMessages.append(
-                        f'Error en el campo "Duración" de la fila {cont} en la sección horarios. "{i['rep']}" no es una duración válida.')
+                        f'Error en el campo "Duración" de la fila {cont} en la sección horarios. "{i['rep']}" no es una '
+                        'duración válida.')
 
             if len(errorMessages) == 0:
                 # Send Commands
@@ -248,7 +256,8 @@ def editData():
         if len(errorMessages) != 0:
             for errorMessage in errorMessages:
                 flash(errorMessage, 'danger')
-            flash('Mensajes UDP no enviados. Es necesario corregir los campos erróneos antes de enviar los mensajes.', 'danger')
+            flash('Mensajes UDP no enviados. Es necesario corregir los campos erróneos antes de enviar los '
+                  'mensajes.', 'danger')
         elif request.form.get('Apply') is not None:
             flash('Mensajes UDP enviados.', 'success')
 
